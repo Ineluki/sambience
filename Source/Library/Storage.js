@@ -1,0 +1,109 @@
+const Nedb = require('nedb');
+const {Readable,Writable} = require('stream');
+
+class MetaStore {
+
+	constructor(fpath) {
+		this.db = new Nedb({
+			filename: fpath,
+			inMemoryOnly: false,
+		  	timestampData: true,
+		  	autoload: true
+		});
+		this.keys = [
+			'file','artist','album','title','year','disknum','tracknum'
+		];
+	}
+
+	updateFile(data) {
+		const _this = this;
+		console.log("UPDATE "+JSON.stringify(data));
+		return new Promise(function(resolve, reject) {
+			if (data.remove && data.file) {
+				_this.db.remove({ file: data.file},{},(err,numRemoved) => {
+					if (err) reject(err);
+					else resolve(numRemoved);
+				});
+			} else {
+				let strippedData = {};
+				_this.keys.forEach((key) => {
+					strippedData[key] = key in data ? data[key] : null;
+				});
+				_this.db.update({ file: data.file }, strippedData, { upsert: true }, function (err, numReplaced, upsert) {
+					if (err) reject(err);
+					else resolve(upsert);
+		 		});
+			}
+		});
+	}
+
+	getPathStartRegexp(path) {
+		path = path.replace(/[\.\[\]\(\)\-\+\*\?]/g,'\\$0');
+		return new RegExp('^'+path+'[^\/]+$');	//only in this path, not subpaths
+	}
+
+	searchByPath(path) {
+		const _this = this;
+		let reg = this.getPathStartRegexp(path);
+		return new Promise(function(resolve, reject) {
+			_this.db.find({ file: { $regex: reg }},(err,docs) => {
+				if (err) reject(err);
+				else resolve(docs);
+			});
+		});
+	}
+
+	searchByArtist(artist,album,title) {
+		return new Promise((resolve, reject) => {
+			let search = {};
+			if (artist) search.artist = artist;
+			if (album) search.album = album;
+			if (title) search.title = title;
+			this.db.find(search,(err,docs) => {
+				if (err) reject(err);
+				else resolve(docs);
+			})
+		});
+	}
+
+	getByIds(ids) {
+		return new Promise((resolve, reject) => {
+			this.db.find({ _id: { $in: ids } },(err,docs) => {
+				if (err) reject(err);
+				else resolve(docs);
+			});
+		});
+	}
+
+	getWriteStream() {
+		const _this = this;
+		return new Writable({
+			objectMode: true,
+			write: function(data,enc,cb) {
+				_this.updateFile(data).then(() => { cb(); }, (err) => { cb(err); });
+			}
+		});
+	}
+
+	getReadStream(query) {
+		const _this = this;
+		var err,docs,resume;
+		this.db.find(query,(e,d) => {
+			if (e) {
+				r.emit('error',e);
+			} else {
+				d.forEach((doc) => { r.push(doc); });
+				r.push(null);
+			}
+		});
+		const r = new Readable({
+			objectMode: true,
+			read: function(cb) {
+			}
+		});
+		return r;
+	}
+
+}
+
+module.exports = MetaStore;

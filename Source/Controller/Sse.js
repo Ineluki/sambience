@@ -1,0 +1,13 @@
+const SSE = require('sse-broadcast');
+
+module.exports = function(router) {
+	const sse = SSE();
+	router.addRoute('GET /', async (ctx,next) => {
+		sse.subscribe('channel',ctx.res);
+		ctx.respond = false;
+	});
+
+	setInterval(() => {
+		sse.publish('channel','event-type','data-message');
+	},1200);
+}
