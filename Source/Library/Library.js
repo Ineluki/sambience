@@ -14,6 +14,8 @@ class Library {
 		this.playlistStorage = new PlaylistStorage('Data/playlist.db',this.storage);
 		this.scanning = false;
 		this.playlists = new Map();
+
+		this.indices = new Map();
 	}
 
 	loadPlaylists() {
@@ -25,6 +27,13 @@ class Library {
 			});
 			return lists;
 		});
+	}
+
+	loadIndices() {
+		let waitFor = [];
+		this.indices[Library.INDEX_DIR] = new DirectoryIndex(this.storage);
+		waitFor.push( this.indices[Library.INDEX_DIR].buildIndex() );
+		return Promise.all(waitFor);
 	}
 
 	createPlaylist(name) {
@@ -67,21 +76,12 @@ class Library {
 	}
 
 	getIndex(type) {
-		switch(type) {
-			case this.INDEX_DIR:
-				return new DirectoryIndex(this.storage);
-
-			case this.INDEX_ARTIST:
-				return new ArtistIndex(this.storage);
-
-			default:
-				throw new Error("unknown index type: "+type);
-		}
+		return this.indices[type];
 	}
 
-	static INDEX_DIR = 'directory';
-	static INDEX_ARTIST = 'artist';
-
 }
+
+Library.INDEX_DIR = 'directory';
+Library.INDEX_ARTIST = 'artist';
 
 module.exports = Library;

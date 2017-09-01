@@ -37,9 +37,9 @@ class MetaStore {
 		});
 	}
 
-	getPathStartRegexp(path) {
+	getPathStartRegexp(path,subdirs=false) {
 		path = path.replace(/[\.\[\]\(\)\-\+\*\?]/g,'\\$0');
-		return new RegExp('^'+path+'[^\/]+$');	//only in this path, not subpaths
+		return new RegExp('^'+path+(subdirs ? '' : '[^\/]+$'));
 	}
 
 	searchByPath(path) {

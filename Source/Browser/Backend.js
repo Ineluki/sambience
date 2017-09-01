@@ -1,39 +1,54 @@
 import Vue from 'vue';
+const axios = require('axios');
 
-const sse = new EventSource('/sse/');
+// const sse = new EventSource('/sse/');
 const bus = new Vue();
+//
+// let bindEvents = ['status'];
+// bindEvents.forEach(event => {
+// 	sse.addEventListener(event,function(e) {
+// 		let data = JSON.parse(e.data);
+// 		bus.$emit(event,data);
+// 	});
+// });
+//
+// sse.onerror = function(e) {
+// 	console.error("see-error",e);
+// };
 
-let bindEvents = ['status'];
-bindEvents.forEach(event => {
-	sse.addEventListener(event,function(e) {
-		let data = JSON.parse(e.data);
-		bus.$emit(event,data);
+// const pl = new Playlist();
+//
+// const getPlaylistData = function() {
+// 	return pl.toJSON();
+// }
+//
+// const moveGroup = function(oldIndex,newIndex) {
+// 	pl.orderGroup(oldIndex,newIndex);
+// }
+//
+// const moveSong = function(grp,oldIndex,newIndex) {
+// 	pl.orderSong(grp, oldIndex, grp, newIndex);
+// }
+//
+// const addPathToList = function(list,path) {
+// 	data.forEach(i => {
+// 		if (i.file && i.file.substr(0,path.length) === path) {
+// 			pl.addFile(i);
+// 		}
+// 	});
+// 	bus.$emit('playlist-update');
+// };
+
+const request = function(action,params) {
+	return axios({
+		method: 'GET',
+		url: action + (params ? `?__p=${JSON.stringify(params)}` : '')
+	}).then(result => {
+		return result.data;
 	});
-});
-
-sse.onerror = function(e) {
-	console.error("see-error",e);
-};
-
-const pl = new Playlist();
-
-const getPlaylistData = function() {
-	return pl.toJSON();
 }
 
-const moveGroup = function(oldIndex,newIndex) {
-	pl.orderGroup(oldIndex,newIndex);
-}
-
-const moveSong = function(grp,oldIndex,newIndex) {
-	pl.orderSong(grp, oldIndex, grp, newIndex);
-}
-
-const addPathToList = function(list,path) {
-	data.forEach(i => {
-		if (i.file && i.file.substr(0,path.length) === path) {
-			pl.addFile(i);
-		}
-	});
-	bus.$emit('playlist-update');
+module.exports = {
+	request,
+	bus
 };

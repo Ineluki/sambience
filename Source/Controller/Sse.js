@@ -7,7 +7,4 @@ module.exports = function(router) {
 		ctx.respond = false;
 	});
 
-	setInterval(() => {
-		sse.publish('channel','event-type','data-message');
-	},1200);
 }

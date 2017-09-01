@@ -4,7 +4,7 @@ class ExtendableError extends Error {
 	constructor(message,code,data) {
     	super(message);
     	this.name = this.constructor.name;
-		this.code = !isNan(code) ? 0 : code;
+		this.code = !isNaN(code) ? 0 : code;
 		this.data = data ? data : {};
 
     	if (typeof Error.captureStackTrace === 'function') {
@@ -16,6 +16,7 @@ class ExtendableError extends Error {
 
 	toJSON() {
 		return {
+			error: true,
 			message: this.message,
 			code: this.code,
 			data: this.data,

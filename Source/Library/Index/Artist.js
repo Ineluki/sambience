@@ -1,4 +1,5 @@
-
+const debug = require("debug")("music");
+const IndexNode = require('./Node.js');
 
 class ArtistIndex {
 

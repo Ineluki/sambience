@@ -5,7 +5,10 @@
 		<ul id="folders">
 		  	<tree
 		    	class="item"
-		    	:model="treeData">
+		    	:path="tree.path"
+				:label="tree.label"
+				:size="999"
+				:leafCount="999">
 		  	</tree>
 		</ul>
 		<h2>Table</h2>
@@ -19,13 +22,12 @@
 <script>
 import Tree from './Tree.vue';
 import Table from './Table.vue';
-import {getDirTree} from '../Browser/Backend.js';
 export default {
   	name: 'app',
   	data () {
 		let d = {
 			msg: 'test msg',
-			treeData : getDirTree(),
+			tree: { path: [], label: 'Root' },
 			gridColumns: ['disknum','tracknum','title'],
 			groupColumns: ['artist','album']
 		};

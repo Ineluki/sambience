@@ -36,7 +36,7 @@ export default {
 			this.playlist = getPlaylistData();
 		});
 		return {
-			playlist: getPlaylistData()
+			playlist: []
 		}
 	},
 	computed: {

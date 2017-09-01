@@ -1,56 +1,66 @@
-
+const debug = require("debug")("music");
+const IndexNode = require('./Node.js');
 
 class DirectoryIndex {
 
 	constructor(storage) {
 		this.storage = storage;
+		this.root = null;
+		this.reset();
 	}
 
-	getIndex() {
-		let tree = { name: 'root', path: '/', children: {} };
-		const addPath = function(p) {
-			let parts = p.split('/');
-			let node = tree;
-			let accumulated = '';
-			parts.forEach((p,i) => {
-				accumulated += '/'+p;
-				if (!node.children[p]) {
-					node.children[p] = {
-						name: p,
-						path: accumulated.substr(1)
-					};
-					if (i < parts.length-1) {
-						node.children[p].children = {};
-					}
-				}
-				node = node.children[p];
-			});
-		};
-		const findRoot = function(tree) {
-			if (tree.children) {
-				let keys = Object.keys(tree.children);
-				if(keys.length < 2) {
-					return findRoot(tree.children[keys[0]]);
-				}
-				return tree;
-			}
-			return tree;
-		}
-		const _this = this;
+	reset() {
+		this.root = new IndexNode('root','');
+	}
+
+	addPath(p) {
+		let parts = p.substr(1).split('/');
+		let node = this.root;
+		let accumulated = '';
+		parts.forEach((p,i) => {
+			accumulated += '/'+p;
+			node = node.addChild(p,p);
+		});
+	};
+
+	buildIndex() {
 		return new Promise((resolve, reject) => {
-			this.createReadStream();
-			.on('data',i => {
-				if (i.file) {
-					addPath(i.file);
-				}
+			let filter = {};	//sub ? { file: { $regex: this.storage.getPathStartRegexp(sub,true) }} : {};
+			debug("build dir index with filter:",filter);
+			this.storage.getReadStream(filter)
+			.on('data',(i) => {
+				if (i.file) this.addPath(i.file);
 			})
-			.on('end',() => { resolve( findRoot(tree) ); })
+			.on('end',() => {
+				this.root = this.root.findRoot();
+				//this.root.parent = null;
+				resolve();
+			})
 			.on('error',e => { reject(e); });
 		});
 	}
 
+	getIndex(path) {
+		if (path && !path.map) {
+			path = [path];
+		}
+		return this.root.traverseByPath(path);
+	}
+
+	/**
+	 * take a path from the index and return a promise for items
+	 * @return Promise
+	 **/
 	handleInput(path) {
 		return this.storage.searchByPath( path );
+	}
+
+	getRoot() {
+		return this.root;
+	}
+
+	toJSON() {
+		return this.root.toJSON();
 	}
 
 }
