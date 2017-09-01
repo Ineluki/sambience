@@ -52,7 +52,8 @@ class DirectoryIndex {
 	 * @return Promise
 	 **/
 	handleInput(path) {
-		return this.storage.searchByPath( path );
+		let p = '/'+path.join('/');
+		return this.storage.searchByPath( p );
 	}
 
 	getRoot() {

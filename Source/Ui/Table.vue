@@ -1,7 +1,7 @@
 <template>
-	<div class="playlist">
-		<draggable :list="playlist" @change="onGroupChange">
-			<div class="group" v-for="(group, grpIndex) in playlist">
+	<div id="playlist">
+		<draggable :list="data" @change="onGroupChange($event)">
+			<div class="group" v-for="(group, grpIndex) in data">
 				<header>
 					<span v-for="(key,index) in groupColumns">
 						{{group.group[key]}} <span v-if="index+1 < groupColumns.length"> - </span>
@@ -24,33 +24,44 @@
 <script>
 import Vue from 'vue'
 import draggable from 'vuedraggable';
-import {getPlaylistData, moveSong, moveGroup, bus} from '../Browser/Backend.js';
+import {request, bus} from '../Browser/Backend.js';
+import {currentPlaylist} from '../Browser/Cache.js';
 export default {
 	name: 'grid',
 	props: {
 		columns: Array,
-		groupColumns: Array
+		groupColumns: Array,
+		data: Array
 	},
 	data: function () {
-		bus.$on('playlist-update',() => {
-			this.playlist = getPlaylistData();
-		});
-		return {
-			playlist: []
-		}
-	},
-	computed: {
-
-	},
-	filters: {
-
+		return {};
 	},
 	methods: {
 		onGroupChange: function(e) {
-			moveGroup(e.moved.oldIndex, e.moved.newIndex);
+			console.log("onGroupChange",e);
+			request('/playlist/movegroup',{
+				id: currentPlaylist(),
+				newpos: e.moved.newIndex,
+				oldpos: e.moved.oldIndex
+			}).then((list) => {
+				bus.$emit('playlist-update',{
+					id: currentPlaylist(),
+					data: list
+				});
+			});
 		},
 		onItemChange: function(e,g) {
-			moveSong(g, e.moved.oldIndex, e.moved.newIndex);
+			request('/playlist/moveitem',{
+				id: currentPlaylist(),
+				group: g,
+				newpos: e.moved.newIndex,
+				oldpos: e.moved.oldIndex
+			}).then((list) => {
+				bus.$emit('playlist-update',{
+					id: currentPlaylist(),
+					data: list
+				});
+			});
 		}
 	},
 	components: {

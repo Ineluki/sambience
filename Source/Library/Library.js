@@ -79,6 +79,22 @@ class Library {
 		return this.indices[type];
 	}
 
+	getPlaylist(id) {
+		return this.playlists.get(id);
+	}
+
+	getPlaylistOverview() {
+		let res = [];
+		this.playlists.forEach((pl) => {
+			res.push({ _id: pl._id, name: pl.name });
+		});
+		return res;
+	}
+
+	savePlaylist(pl) {
+		return this.playlistStorage.save(pl);
+	}
+
 }
 
 Library.INDEX_DIR = 'directory';

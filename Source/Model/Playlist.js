@@ -6,7 +6,7 @@ class Playlist {
 		this.name = '';
 		this.createdAt = null;
 		this.updatedAt = null;
-		
+
 		this.groupDefinition = ['artist','album'];
 		this.sortDefinition = ['disknum','tracknum'];
 
@@ -44,7 +44,7 @@ class Playlist {
 	}
 
 	addFile(file) {
-		let group = this.getGroupKey(file,group);
+		let group = this.getGroupKey(file);
 		let groupKey = group._key;
 		if (!this.groupMap.has(groupKey)) {
 			let grpNode = this.root.addChild(group);

@@ -52,7 +52,7 @@ class PlaylistStorage {
 			this.keys.forEach(key => {
 				data[key] = pl[key];
 			});
-			this.db.update({ _id: pl._id }, data, { upsert: true }, (err, numReplaced, data) => {
+			this.db.update({ _id: pl._id }, data, { upsert: true, multi: false, returnUpdatedDocs: true }, (err, numReplaced, data) => {
 				if (err) {
 					reject(err);
 				} else {

@@ -19,15 +19,30 @@ body,
 	height: 50px;
 	background: #333;
 	color: #aaa;
+	flex-shrink: 0;
 }
 #main {
 	flex-grow: 1;
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: stretch;
+	justify-content: flex-start;
+	> ul {
+		background: #333;
+		color: #aaa;
+		flex-shrink: 0;
+	}
+}
+#playlist {
+	flex-grow: 1;
+	overflow-y: auto;
 }
 #index {
 	background: #ccc;
 	margin: 0;
 	padding: 0;
 	max-width: 250px;
+	min-width: 150px;
 	font-size: 13px;
 	overflow-y: auto;
 }

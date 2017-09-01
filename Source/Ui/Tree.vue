@@ -2,7 +2,7 @@
 	<li>
 	    <div
 			:class="{bold: isFolder}"
-			@dblclick="addToPlaylist(path)">
+			@dblclick="addToPlaylist">
 
 			<span @click="toggle" v-if="isFolder">[{{open ? '-' : '+'}}]</span>
 			{{label}} {{sizes}}
@@ -22,7 +22,8 @@
 
 <script>
 import Vue from 'vue'
-import {request} from '../Browser/Backend.js';
+import {request,bus} from '../Browser/Backend.js';
+import {currentPlaylist as currentList} from '../Browser/Cache.js';
 const Tree = {
 	name: 'tree',
 	props: {
@@ -67,8 +68,19 @@ const Tree = {
 			}
 		},
 		addToPlaylist: function (path) {
-			console.log("adding",path);
-			addPathToList(1,path);
+			console.log("adding",this.path);
+			if (!currentList()) return;
+			request('/playlist/additems',{
+				id: currentList(),
+				value: this.path,
+				type: 'directory'
+			})
+			.then((list) => {
+				bus.$emit('playlist-update',{
+					id: currentList(),
+					data: list
+				});
+			});
 		}
 	},
 	components: {

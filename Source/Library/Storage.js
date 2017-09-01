@@ -44,7 +44,8 @@ class MetaStore {
 
 	searchByPath(path) {
 		const _this = this;
-		let reg = this.getPathStartRegexp(path);
+		let reg = this.getPathStartRegexp(path,true);
+		console.log("searchByPath",reg);
 		return new Promise(function(resolve, reject) {
 			_this.db.find({ file: { $regex: reg }},(err,docs) => {
 				if (err) reject(err);

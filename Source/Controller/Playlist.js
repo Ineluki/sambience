@@ -1,38 +1,55 @@
-
+const ReqRes = require('../Util/Reqres.js');
 const Lib = require('../Library/Main.js');
 
 const methods = {};
 
-methods['GET /create'] = async (ctx,next) => {
-	let name = ctx.request.query.name || 'new';
-	await Lib.createPlaylist(name)
-	.then((pl) => {
-		ctx.body = JSON.stringify({
-			name: pl.name,
-			_id: pl._id
+methods['GET /create'] = (params) => {
+	return Promise.resolve( Lib.createPlaylist(params.name) );
+};
+methods['GET /create'].params = ['name'];
+
+methods['GET /additems'] = (params) => {
+	let pl = Lib.getPlaylist(params.id);
+	if (!pl) return Promise.reject(new Error("unknown playlist"));
+	let index = Lib.getIndex(params.type);
+	return index.handleInput(params.value)
+	.then((items) => {
+		items.forEach((item) => {
+			pl.addFile(item);
 		});
+		Lib.savePlaylist(pl);
+		return pl;
 	});
 };
+methods['GET /additems'].params = ['id','type','value'];
 
-methods['GET /additems'] = async (ctx,next) => {
-	let id = ctx.request.query.id;
-	let pathtype = ctx.request.query.type;
-	let pathvalue = ctx.request.query.value;
-
-	let pl = Lib.getPlaylist(id);
-	if (!pl || !pathtype || !pathvalue) {
-		ctx.body = JSON.stringify({
-			error: true,
-			message: 'missing parameter'
-		});
-	} else {
-		
-	}
+methods['GET /'] = (params) => {
+	return Promise.resolve( Lib.getPlaylistOverview() );
 };
+methods['GET /'].params = [];
 
+
+methods['GET /get'] = (params) => {
+	return Promise.resolve( Lib.getPlaylist(params.id) );
+};
+methods['GET /get'].params = ['id'];
+
+methods['GET /moveitem'] = (params) => {
+	let pl = Lib.getPlaylist(params.id);
+	pl.orderSong(params.group, params.oldpos, params.group, params.newpos);
+	Lib.savePlaylist(pl);
+	return Promise.resolve( pl );
+};
+methods['GET /moveitem'].params = ['id','oldpos','newpos','group'];
+
+methods['GET /movegroup'] = (params) => {
+	let pl = Lib.getPlaylist(params.id);
+	pl.orderGroup(params.group, params.oldpos, params.newpos);
+	Lib.savePlaylist(pl);
+	return Promise.resolve( pl );
+};
+methods['GET /movegroup'].params = ['id','oldpos','newpos'];
 
 module.exports = function(router) {
-	for(let r in methods) {
-		router.addRoute(r,methods[r]);
-	}
+	ReqRes.fillRouter(router,methods);
 };
