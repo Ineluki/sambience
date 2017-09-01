@@ -1,21 +1,29 @@
 <template>
 	<main id="app">
-		<h1>vue</h1>
-		<h2>Tree</h2>
-		<ul id="folders">
-		  	<tree
-		    	class="item"
-		    	:path="tree.path"
-				:label="tree.label"
-				:size="999"
-				:leafCount="999">
-		  	</tree>
-		</ul>
-		<h2>Table</h2>
-		<grid
-			:columns="gridColumns"
-			:group-columns="groupColumns">
-  		</grid>
+			<ul id="index">
+			  	<tree
+			    	class="item"
+			    	:path="tree.path"
+					:label="tree.label"
+					:size="999"
+					:leafCount="999">
+			  	</tree>
+			</ul>
+			<div id="main">
+				<div id="header">
+					Status / Actions / Modes
+				</div>
+				<div id="playlists">
+					<div class="riders">
+						pl 1 / pl 2 / pl 3
+					</div>
+					<grid
+						:columns="gridColumns"
+						:group-columns="groupColumns">
+			  		</grid>
+				</div>
+			</div>
+		</main>
 	</main>
 </template>
 
@@ -41,12 +49,6 @@ export default {
 </script>
 
 <style scoped>
-#app {
-	font-family: 'Avenir', Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	color: #2c3e50;
-	margin-top: 60px;
-}
+
 
 </style>

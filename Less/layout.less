@@ -1,0 +1,33 @@
+//main: app.less
+html,
+body,
+#app {
+	height: 100%;
+}
+
+#app {
+	font-family: 'Avenir', Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	color: #2c3e50;
+
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: stretch;
+}
+#header {
+	height: 50px;
+	background: #333;
+	color: #aaa;
+}
+#main {
+	flex-grow: 1;
+}
+#index {
+	background: #ccc;
+	margin: 0;
+	padding: 0;
+	max-width: 250px;
+	font-size: 13px;
+	overflow-y: auto;
+}

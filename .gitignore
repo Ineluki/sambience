@@ -12,3 +12,5 @@ yarn-error.log
 *.sln
 
 Data/
+Web/app.js
+Web/app.css
