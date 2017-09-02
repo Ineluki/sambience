@@ -16,6 +16,8 @@ class Playlist {
 
 	}
 
+	getId() { return this._id; }
+
 	sort(def) {
 		if (typeof def !== 'undefined') {
 			this.sortDefinition = def;
@@ -72,14 +74,10 @@ class Playlist {
 		return grp;
 	}
 
-	clone() {
-		let pl = new Playlist();
-		// this.all.forEach(entry => { pl.add(entry.song); });
-		return pl;
-	}
-
 	moveToPosition(gpos,spos=0) {
+		if (!this.root.getChild(gpos) || !this.root.getChild(gpos).getChild(spos)) return false;
 		this.currentPosition = this.root.getChild(gpos).getChild(spos);
+		return true;
 	}
 
 	moveToNextSong() {
@@ -91,8 +89,20 @@ class Playlist {
 				return false;
 			}
 		}
-		if (this.currentPosition.next) {
-			this.currentPosition = this.currentPosition.next;
+		let next = this.currentPosition.getNext();
+		if (next) {
+			this.currentPosition = next;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	moveToPrevSong() {
+		if (!this.currentPosition) return false;
+		let next = this.currentPosition.getPrev();
+		if (next) {
+			this.currentPosition = next;
 			return true;
 		} else {
 			return false;
@@ -110,6 +120,17 @@ class Playlist {
 		return true;
 	}
 
+	moveToNextGroup() {
+		if (!this.currentPosition) {
+			return this.moveToNextSong();
+		}
+		if (this.currentPosition.parent.next) {
+			this.currentPosition = this.currentPosition.parent.next.firstChild;
+			return true;
+		}
+		return false;
+	}
+
 	getCurrentSong() {
 		if (!this.currentPosition) {
 			if (!this.moveToNextSong()) {
@@ -117,6 +138,11 @@ class Playlist {
 			}
 		}
 		return this.currentPosition.content;
+	}
+
+	isAtEndOfGroup() {
+		if (!this.currentPosition) return false;
+		return this.currentPosition.next === null;
 	}
 
 	orderSong(gpos,spos, ngpos,nspos) {

@@ -1,12 +1,16 @@
 const player = require('play-sound');
+const debug = require('debug')('music');
 
 const methods = {};
 
-var audio;
+let audio;
 
 methods.start = function(file) {
 	methods.stop();
 	return new Promise(function(resolve, reject) {
+		debug("playing "+file);
+		audio = setTimeout(resolve,3300);
+		return;
 		audio = player.play(file, function(err){
 			audio = null;
 			if (err && !err.killed) reject(err);
@@ -16,8 +20,10 @@ methods.start = function(file) {
 };
 
 methods.stop = function() {
+	debug("stop play");
 	if (audio) {
-		audio.kill();
+		clearTimeout(audio);
+		//audio.kill();
 		audio = null;
 	}
 };

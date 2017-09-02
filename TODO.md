@@ -4,14 +4,12 @@ TODO
 Design
 ------
 
-# Can the same playlist contain multiple identical files and albums?
-...why?
- - if not, we can work with unique keys in the tree to identify nodes
-  - do we even use this now?
-
-sometimes less freedom is more - be opinionated?
 
 Features
 --------
 
-Tree with other criteria (artist / album, genre / year, files)
+ - playback controls and feedback
+ - add new playlist, remove from playlist
+ - kontext menu?
+ - Tree with other criteria (artist / album, genre / year, files)
+ - tree filter by search (auto-open results?)

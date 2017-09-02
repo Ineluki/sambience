@@ -1,5 +1,5 @@
 
-var nodes = 0;
+let nodes = 0;
 
 class TreeNode {
 

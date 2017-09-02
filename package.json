@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.16.2",
+    "bootstrap": "^3.3.7",
     "debug": "^3.0.1",
     "folder-reader": "^1.1.0",
     "koa": "^2.3.0",

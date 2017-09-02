@@ -1,20 +1,20 @@
 import Vue from 'vue';
 const axios = require('axios');
 
-// const sse = new EventSource('/sse/');
+const sse = new EventSource('/sse/');
 const bus = new Vue();
-//
-// let bindEvents = ['status'];
-// bindEvents.forEach(event => {
-// 	sse.addEventListener(event,function(e) {
-// 		let data = JSON.parse(e.data);
-// 		bus.$emit(event,data);
-// 	});
-// });
-//
-// sse.onerror = function(e) {
-// 	console.error("see-error",e);
-// };
+
+let bindEvents = ['status'];
+bindEvents.forEach(event => {
+	sse.addEventListener(event,function(e) {
+		let data = JSON.parse(e.data);
+		bus.$emit(event,data);
+	});
+});
+
+sse.onerror = function(e) {
+	console.error("see-error",e);
+};
 
 // const pl = new Playlist();
 //

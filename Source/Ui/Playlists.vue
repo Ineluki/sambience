@@ -1,25 +1,29 @@
 <template>
 	<div id="main">
 		<div id="header">
-			Status / Actions / Modes
+			<playback></playback>
 		</div>
 		<ul>
 			<li v-for="pl in playlistMeta"
 				@click="changeOpenList(pl._id)"
 				v-bind:class="{ active: (pl._id == currentList) }">
+				<span class="glyphicon glyphicon-play"
+					v-bind:class="{ hidden: (pl._id != playing.playlist) }"></span>
 				{{pl.name}}
 			</li>
 		</ul>
 		<grid
 			:columns="gridColumns"
 			:group-columns="groupColumns"
-			:data="playlistData">
+			:data="playlistData"
+			:active="playing.song">
 		</grid>
 	</div>
 </template>
 
 <script>
 import Table from './Table.vue';
+import Playback from './Playback.vue';
 import {request,bus} from '../Browser/Backend.js';
 import {currentPlaylist} from '../Browser/Cache.js';
 
@@ -47,7 +51,11 @@ export default {
 				this.playlistData = this.playlists[this.currentList];
 			}
 		});
+		bus.$on('status',(data) => {
+			this.playing = data;
+		});
     	return {
+			playing: {},
 			currentList: null,
 			playlists: {},
 			playlistMeta: {},
@@ -84,7 +92,8 @@ export default {
 		}
 	},
 	components: {
-		grid: Table
+		grid: Table,
+		playback: Playback
 	}
 }
 </script>

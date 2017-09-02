@@ -1,9 +1,9 @@
-const SSE = require('sse-broadcast');
+const Status = require('../Playback/Status.js');
 
 module.exports = function(router) {
-	const sse = SSE();
+
 	router.addRoute('GET /', async (ctx,next) => {
-		sse.subscribe('channel',ctx.res);
+		Status.subscribe(ctx.res);
 		ctx.respond = false;
 	});
 

@@ -9,7 +9,11 @@
 				</header>
 				<main>
 					<draggable :list="group.children" @change="onItemChange($event,grpIndex)">
-						<div class="item" v-for="entry in group.children">
+						<div class="item"
+							v-for="(entry,entryIndex) in group.children"
+							@dblclick="play(grpIndex,entryIndex)">
+							<span class="glyphicon glyphicon-play"
+								v-bind:class="{ invisible: (active != entry._id) }"></span>
 							<span v-for="key in columns">
 								{{entry[key]}}
 							</span>
@@ -29,6 +33,7 @@ import {currentPlaylist} from '../Browser/Cache.js';
 export default {
 	name: 'grid',
 	props: {
+		active: String,
 		columns: Array,
 		groupColumns: Array,
 		data: Array
@@ -62,6 +67,13 @@ export default {
 					data: list
 				});
 			});
+		},
+		play: function(group,song) {
+			request('/playback/setposition',{
+				playlist: currentPlaylist(),
+				group: group,
+				song: song
+			});
 		}
 	},
 	components: {
@@ -81,7 +93,7 @@ export default {
 	text-align: center;
 	background: rgba(200, 200, 220, 0.5);
 }
-.item > span:not(:nth-child(3)) {
+.item > span:not(:nth-child(4)) {
 	width: 1em;
 	display: inline-block;
 	text-align: right;
