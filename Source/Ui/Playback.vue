@@ -20,8 +20,8 @@
 		<div class="modes">
 			<select @change="changeMode" v-model="mode">
 				<option value="0">Normal</option>
-				<option value="1">Rnd Song</option>
-				<option value="2">Rng Grp</option>
+				<option value="1">Shuffle Song</option>
+				<option value="2">Shuffle Group</option>
 				<option value="3">Repeat</option>
 			</select>
 		</div>
@@ -46,7 +46,7 @@ export default {
 			});
 		},
 		changeMode: function(e) {
-			console.log("changeMode",this.mode);
+			//console.log("changeMode",this.mode);
 			request('/playback/setmode',{mode: this.mode});
 		}
 	},

@@ -8,9 +8,10 @@
 				@click="changeOpenList(pl._id)"
 				v-bind:class="{ active: (pl._id == currentList) }">
 				<span class="glyphicon glyphicon-play"
-					v-bind:class="{ hidden: (pl._id != playing.playlist) }"></span>
+					v-bind:class="{ invisible: (pl._id != playing.playlist) }"></span>
 				{{pl.name}}
 			</li>
+			<li @click="addPlaylist"> + </li>
 		</ul>
 		<grid
 			:columns="gridColumns"
@@ -45,14 +46,18 @@ export default {
 			}
 		});
 		bus.$on('playlist-update',(res) => {
-			console.log("playlist-update detected",res,this);
+			//console.log("playlist-update detected",res,this);
 			this.playlists[res.id] = res.data;
 			if (res.id === this.currentList) {
 				this.playlistData = this.playlists[this.currentList];
 			}
 		});
-		bus.$on('status',(data) => {
-			this.playing = data;
+		bus.$on('playback',(data) => {
+			if (data.type === 'start') {
+				this.playing = data;
+			} else if(data.type === 'stop') {
+				this.playing = {};
+			}
 		});
     	return {
 			playing: {},
@@ -65,13 +70,7 @@ export default {
 		};
   	},
 	computed: {
-		// playlistData: function() {
-		// 	if (this.currentList && this.currentList in this.playlists) {
-		// 		return this.playlists[this.currentList];
-		// 	} else {
-		// 		return [];
-		// 	}
-		// }
+
 	},
 	methods: {
 		changeOpenList: function(id) {
@@ -89,6 +88,12 @@ export default {
 			} else {
 				this.playlistData = this.playlists[this.currentList];
 			}
+		},
+		addPlaylist: function() {
+			request('/playlist/create',{name: 'new pl'})
+			.then((pl) => {
+				this.playlistMeta[ pl._id ] = pl;
+			})
 		}
 	},
 	components: {

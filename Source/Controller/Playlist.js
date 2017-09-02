@@ -4,7 +4,10 @@ const Lib = require('../Library/Main.js');
 const methods = {};
 
 methods['GET /create'] = (params) => {
-	return Promise.resolve( Lib.createPlaylist(params.name) );
+	return Lib.createPlaylist(params.name)
+	.then((pl) => {
+		return { _id: pl._id, name: pl.name }
+	});
 };
 methods['GET /create'].params = ['name'];
 

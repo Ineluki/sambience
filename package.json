@@ -28,6 +28,7 @@
     "sse-broadcast": "^0.4.1",
     "symbol-tree": "^3.2.2",
     "vue": "^2.0.1",
+    "vue-context-menu": "^2.0.6",
     "vuedraggable": "^2.14.1"
   },
   "devDependencies": {

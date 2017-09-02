@@ -22,7 +22,8 @@ methods.wrap = function(args,fn) {
 			ctx.body = JSON.stringify(e,null,' ');
 			return;
 		}
-		await fn(params)
+		await Promise.resolve(params)
+		.then(fn)
 		.then((res) => {
 			ctx.body = JSON.stringify(res,null,' ');
 		},(err) => {

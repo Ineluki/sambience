@@ -8,8 +8,10 @@ Design
 Features
 --------
 
- - playback controls and feedback
- - add new playlist, remove from playlist
- - kontext menu?
+ - add new playlist
+ - kontext menu
+ - rename playlist
+ - remove songs/groups from playlist
  - Tree with other criteria (artist / album, genre / year, files)
  - tree filter by search (auto-open results?)
+ - song duration and timeline feedback

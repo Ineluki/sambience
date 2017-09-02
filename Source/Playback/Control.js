@@ -64,7 +64,8 @@ function playNext() {
 		debug("end of playlist reached");
 		return Promise.resolve();
 	}
-	Status.emit({
+	Status.playback({
+		type: 'start',
 		song: meta._id,
 		playlist: playlist.getId()
 	});
@@ -82,6 +83,7 @@ methods.stop = function() {
 	if (playing) {
 		playing = false;
 		Play.stop();
+		Status.playback({ type: 'stop' });
 	}
 };
 
