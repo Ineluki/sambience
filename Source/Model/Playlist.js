@@ -158,17 +158,20 @@ class Playlist {
 	}
 
 	removeSong(gpos,spos) {
-		let leaf = this.root.getChild(gpos).getChild(spos);
+		let parent = this.root.getChild(gpos);
+		let leaf = parent.getChild(spos);
 		if (this.currentPosition === leaf) {
 			this.currentPosition = leaf.getNext();
 		}
-		leaf.parent.removeChild(leaf);
-
+		parent.removeChild(leaf);
+		if (parent.size === 0) {
+			this.removeGroup(gpos);
+		}
 	}
 
 	removeGroup(gpos) {
 		let node = this.root.getChild(gpos);
-		if (this.currentPosition.parent === node) {
+		if (this.currentPosition && this.currentPosition.parent === node) {
 			this.currentPosition = node.next ? node.getNext().firstChild : null;
 		}
 		this.root.removeChild(node);

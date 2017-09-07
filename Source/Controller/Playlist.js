@@ -41,7 +41,7 @@ methods['GET /moveitem'] = (params) => {
 	let pl = Lib.getPlaylist(params.id);
 	pl.orderSong(params.group, params.oldpos, params.group, params.newpos);
 	Lib.savePlaylist(pl);
-	return Promise.resolve( pl );
+	return pl;
 };
 methods['GET /moveitem'].params = ['id','oldpos','newpos','group'];
 
@@ -49,9 +49,25 @@ methods['GET /movegroup'] = (params) => {
 	let pl = Lib.getPlaylist(params.id);
 	pl.orderGroup(params.group, params.oldpos, params.newpos);
 	Lib.savePlaylist(pl);
-	return Promise.resolve( pl );
+	return pl;
 };
 methods['GET /movegroup'].params = ['id','oldpos','newpos'];
+
+methods['GET /removegroup'] = (params) => {
+	let pl = Lib.getPlaylist(params.id);
+	pl.removeGroup(params.pos);
+	Lib.savePlaylist(pl);
+	return pl;
+};
+methods['GET /removegroup'].params = ['id','pos'];
+
+methods['GET /removesong'] = (params) => {
+	let pl = Lib.getPlaylist(params.id);
+	pl.removeSong(params.grp,params.song);
+	Lib.savePlaylist(pl);
+	return pl;
+};
+methods['GET /removesong'].params = ['id','grp','song'];
 
 module.exports = function(router) {
 	ReqRes.fillRouter(router,methods);

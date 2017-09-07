@@ -2,15 +2,21 @@
 	<div id="playlist">
 		<draggable :list="data" @change="onGroupChange($event)">
 			<div class="group" v-for="(group, grpIndex) in data">
-				<header>
-					<span v-for="(key,index) in groupColumns">
-						{{group.group[key]}} <span v-if="index+1 < groupColumns.length"> - </span>
-					</span>
+				<header class="hoverable">
+					<div class="label">
+						<span v-for="(key,index) in groupColumns">
+							{{group.group[key]}} <span v-if="index+1 < groupColumns.length"> - </span>
+						</span>
+					</div>
+					<div class="invisible reveal controls">
+						<div class="btn glyphicon glyphicon-remove-sign" @click="removeGroup(grpIndex)">
+						</div>
+					</div>
 				</header>
 				<main>
 					<draggable :list="group.children" @change="onItemChange($event,grpIndex)">
-						
-						<div class="item"
+
+						<div class="item hoverable"
 							key="song"
 							v-for="(entry,entryIndex) in group.children"
 							@dblclick="play(grpIndex,entryIndex)">
@@ -18,6 +24,10 @@
 								v-bind:class="{ invisible: (active != entry._id) }"></span>
 							<span v-for="key in columns">
 								{{entry[key]}}
+							</span>
+							<span class="invisible reveal">
+								<div class="btn glyphicon glyphicon-remove-sign" @click="removeSong(grpIndex,entryIndex)">
+								</div>
 							</span>
 						</div>
 
@@ -78,6 +88,31 @@ export default {
 				song: song
 			});
 		},
+		removeGroup: function(grp) {
+			console.log("removeGroup",grp);
+			request('/playlist/removegroup',{
+				id: currentPlaylist(),
+				pos: grp
+			}).then((list) => {
+				bus.$emit('playlist-update',{
+					id: currentPlaylist(),
+					data: list
+				});
+			});
+		},
+		removeSong: function(grp,song) {
+			console.log("removeSong",grp);
+			request('/playlist/removesong',{
+				id: currentPlaylist(),
+				grp: grp,
+				song: song
+			}).then((list) => {
+				bus.$emit('playlist-update',{
+					id: currentPlaylist(),
+					data: list
+				});
+			});
+		}
 
 		// beforeEnter: function (el) {
 		// 	el.style.opacity = 0
@@ -121,11 +156,33 @@ export default {
 	text-align: center;
 	background: rgba(200, 200, 220, 0.5);
 }
-.item > span:not(:nth-child(4)) {
-	width: 1em;
-	display: inline-block;
+header {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+
+}
+header > div {
+	flex-grow: 1;
+}
+header > .controls {
 	text-align: right;
 	margin-right: 0.5em;
+}
+.item {
+	display: flex;
+	flex-flow: row nowrap;
+	line-height: 19px;
+}
+.item > span {
+	flex-shrink: 1;
+	flex-grow: 0;
+	text-align: right;
+	margin-right: 0.5em;
+}
+.item > span:nth-child(4) {
+	flex-grow: 1;
+	text-align: left;
 }
 ul {
 	margin: 0;

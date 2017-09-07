@@ -65,3 +65,10 @@ body,
 .invisible {
 	visibility: hidden;
 }
+
+.hoverable:hover > .hidden.reveal {
+	display: inline-block;
+}
+.hoverable:hover > .invisible.reveal {
+	visibility: visible;
+}
