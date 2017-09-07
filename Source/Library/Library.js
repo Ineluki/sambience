@@ -33,6 +33,8 @@ class Library {
 		let waitFor = [];
 		this.indices[Library.INDEX_DIR] = new DirectoryIndex(this.storage);
 		waitFor.push( this.indices[Library.INDEX_DIR].buildIndex() );
+		this.indices[Library.INDEX_ARTIST] = new ArtistIndex(this.storage);
+		waitFor.push( this.indices[Library.INDEX_ARTIST].buildIndex() );
 		return Promise.all(waitFor);
 	}
 

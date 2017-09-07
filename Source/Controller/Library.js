@@ -6,7 +6,7 @@ const methods = {};
 methods['GET /index'] = function(params) {
 	let index = Lib.getIndex(params.type);
 	let data = index.getIndex(params.sub).getView();
-	return Promise.resolve(data);
+	return data;
 };
 methods['GET /index'].params = ['type','sub'];
 

@@ -13,7 +13,8 @@
 		        class="item"
 		        v-for="(child,i) in model.children"
 				v-model="model.children[i]"
-				:searchValue="searchValue">
+				:searchValue="searchValue"
+				:treeMode="treeMode">
 	      	</tree>
 	    </ul>
   	</li>
@@ -32,7 +33,8 @@ const Tree = {
 	},
 	props: {
 		model: Object,
-		searchValue: String
+		searchValue: String,
+		treeMode: String
 	},
 	data: function () {
 		let d = {
@@ -71,9 +73,8 @@ const Tree = {
 		    	this.open = !this.open;
 		  	}
 			if (this.open === true && this.model.size > 0 && !this.loaded) {
-				request('/library/index',{ type: 'directory', sub: this.model.path})
+				request('/library/index',{ type: this.treeMode, sub: this.model.path})
 				.then((res) => {
-					console.log("result",res);
 					this.model.children = res;
 					this.loaded = true;
 				});
@@ -87,7 +88,7 @@ const Tree = {
 			request('/playlist/additems',{
 				id: currentList(),
 				value: this.model.path,
-				type: 'directory'
+				type: this.treeMode
 			})
 			.then((list) => {
 				bus.$emit('playlist-update',{
@@ -97,18 +98,6 @@ const Tree = {
 			});
 		}
 	},
-	// watch: {
-	// 	searchValue: function(){
-	// 		console.log("searchvalue has changed to ",this.searchValue);
-	// 		if (this.searchValue === '') {
-	// 			this.loaded = false;
-	// 			if (this.open) {
-	// 				this.toggle();
-	// 				this.toggle();
-	// 			}
-	// 		}
-	// 	}
-	// },
 	components: {
 		tree: Tree
 	}

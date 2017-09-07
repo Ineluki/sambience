@@ -10,7 +10,8 @@
 				        class="item"
 				        v-for="(child,i) in tree.children"
 						v-model="tree.children[i]"
-						:searchValue="searchValue">
+						:searchValue="searchValue"
+						:treeMode="treeMode">
 			      	</tree>
 			    </ul>
 		  	</li>
