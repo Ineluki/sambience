@@ -1,4 +1,4 @@
-
+const debug = require('debug')('music');
 
 class IndexNode {
 
@@ -52,21 +52,44 @@ class IndexNode {
 		return this.childArr.length;
 	}
 
-	getLeafCounts() {
+	getLeafCounts(f) {
 		if (this.childArr.length) {
 			return this.childArr.map((n) => {
-				return n.getLeafCounts().reduce((v,c) => { return c+v; },0);
+				return n.getLeafCounts(f).reduce((v,c) => { return c+v; },0);
 			});
 		} else {
-			return [1];
+			let match = true;
+			if (f) {
+				//debug("search for "+f+" in "+JSON.stringify(this.path));
+				match = (this.getFullPath().join(" ")).toLowerCase().indexOf(f) > -1;
+			}
+			return [ match ? 1 : 0 ];
 		}
 	}
 
-	getLeafCount() {
+	getLeafCount(f) {
 		if (this.childArr.length) {
-			return this.getLeafCounts().reduce((v,c) => { return c+v; },0);
+			return this.getLeafCounts(f).reduce((v,c) => { return c+v; },0);
 		} else {
 			return 0;
+		}
+	}
+
+	getPathMatchesFilter(filter) {
+		return (this.getFullPath().join(" ")).toLowerCase().indexOf(filter) > -1;
+	}
+
+	getMatchCount(filter) {
+		if (this.getPathMatchesFilter(filter)) {
+			if (this.childArr.length) {
+				return this.getLeafCount();
+			} else {
+				return 1;
+			}
+		} else {
+			return this.childArr.map((n) => {
+				return n.getMatchCount(filter);
+			}).reduce((v,c) => { return c+v; },0);
 		}
 	}
 
@@ -92,9 +115,27 @@ class IndexNode {
 				label: c.getLabel(),
 				path: c.getFullPath(),
 				size: c.getSize(),
-				leafCount: c.getLeafCount()
+				leafCount: c.getLeafCount(),
+				children: []
 			};
 		});
+	}
+
+	getFilteredView(filter) {
+		//debug("getFilteredView("+filter+") "+this.label);
+		return this.childArr.map((c) => {
+			let leafs = c.getMatchCount(filter);
+			if (leafs === 0) return null;
+			let data = {
+				label: c.getLabel(),
+				path: c.getFullPath(),
+				size: c.getSize(),
+				leafCount: leafs,
+				children: []
+			};
+			data.children = c.getFilteredView(filter);
+			return data;
+		}).filter(c => { return c !== null; });
 	}
 
 	traverseByPath(path) {

@@ -9,7 +9,9 @@
 				</header>
 				<main>
 					<draggable :list="group.children" @change="onItemChange($event,grpIndex)">
+						
 						<div class="item"
+							key="song"
 							v-for="(entry,entryIndex) in group.children"
 							@dblclick="play(grpIndex,entryIndex)">
 							<span class="glyphicon glyphicon-play"
@@ -18,6 +20,7 @@
 								{{entry[key]}}
 							</span>
 						</div>
+
 					</draggable>
 				</main>
 			</div>
@@ -74,7 +77,32 @@ export default {
 				group: group,
 				song: song
 			});
-		}
+		},
+
+		// beforeEnter: function (el) {
+		// 	el.style.opacity = 0
+		// 	el.style.height = 0
+		// },
+		// enter: function (el, done) {
+		// 	var delay = el.dataset.index * 150
+		// 	setTimeout(function () {
+		// 		Velocity(
+		// 			el,
+		// 			{ opacity: 1, height: '1.6em' },
+		// 			{ complete: done }
+		// 		)
+		// 	}, delay)
+		// },
+		// leave: function (el, done) {
+		// 	var delay = el.dataset.index * 150
+		// 	setTimeout(function () {
+		// 		Velocity(
+		// 			el,
+		// 			{ opacity: 0, height: 0 },
+		// 			{ complete: done }
+		// 		)
+		// 	}, delay)
+		// }
 	},
 	components: {
 		draggable
@@ -98,5 +126,9 @@ export default {
 	display: inline-block;
 	text-align: right;
 	margin-right: 0.5em;
+}
+ul {
+	margin: 0;
+	padding: 0;
 }
 </style>

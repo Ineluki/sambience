@@ -44,7 +44,15 @@ body,
 	max-width: 250px;
 	min-width: 150px;
 	font-size: 13px;
-	overflow-y: auto;
+	display: flex;
+	flex-flow: column nowrap;
+	> ul {
+		overflow-y: auto;
+		flex-grow: 1;
+	}
+	> .controls {
+		flex-shrink: 0;
+	}
 }
 
 #playback {

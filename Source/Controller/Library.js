@@ -10,6 +10,13 @@ methods['GET /index'] = function(params) {
 };
 methods['GET /index'].params = ['type','sub'];
 
+methods['GET /index/filter'] = function(params) {
+	let index = Lib.getIndex(params.type);
+	let data = index.getIndex([]).getFilteredView(params.search);
+	return data;
+};
+methods['GET /index/filter'].params = ['search','type'];
+
 
 module.exports = function(router) {
 	ReqRes.fillRouter(router,methods);

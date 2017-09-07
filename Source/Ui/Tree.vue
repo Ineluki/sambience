@@ -1,54 +1,65 @@
 <template>
 	<li>
-	    <div
-			:class="{bold: isFolder}"
-			@dblclick="addToPlaylist">
-
-			<span @click="toggle" v-if="isFolder">[{{open ? '-' : '+'}}]</span>
-			{{label}} {{sizes}}
+	    <div :class="{bold: isFolder, animated: justClicked}">
+			<span @click="toggle" v-if="isFolder">
+				[{{opened ? '-' : '+'}}]
+			</span>
+			<span @dblclick="addToPlaylist">
+				{{model.label}} {{sizes}}
+			</span>
 	    </div>
-	    <ul v-show="open" v-if="isFolder">
+	    <ul v-show="opened" v-if="isFolder">
 	      	<tree
 		        class="item"
-		        v-for="child in children"
-				:path="child.path"
-				:label="child.label"
-				:size="child.size"
-				:leafCount="child.leafCount">
+		        v-for="(child,i) in model.children"
+				v-model="model.children[i]"
+				:searchValue="searchValue">
 	      	</tree>
 	    </ul>
   	</li>
 </template>
 
 <script>
-import Vue from 'vue'
+import Vue from 'vue';
 import {request,bus} from '../Browser/Backend.js';
 import {currentPlaylist as currentList} from '../Browser/Cache.js';
+
 const Tree = {
 	name: 'tree',
+	model: {
+		prop: 'model',
+		event: 'change'
+	},
 	props: {
-		path: Array,
-		label: String,
-		size: Number,
-		leafCount: Number
+		model: Object,
+		searchValue: String
 	},
 	data: function () {
-		return {
+		let d = {
 			open: false,
-			children: []
+			justClicked: false,
+			loaded: false
+		};
+		if (this.searchValue.length) {
+			d.open = true;
 		}
+		return d;
 	},
 	computed: {
+		opened: function() {
+			if (this.searchValue.length) return true;
+			return this.open;
+		},
 		isFolder: function() {
-		  	return this.size > 0 || this.leafCount > 0;
+		  	return this.model.size > 0 && this.model.leafCount > 0;
 		},
 		sizes: function() {
-			if (this.leafCount === 0) return '';
+			if (this.model.leafCount === 0 || this.model.size === 0) return '';
 			let r = '(';
-			if (this.leafCount > this.size) {
-				r += this.size + ' / ' + this.leafCount;
+			if (this.model.leafCount > this.model.size) {
+				r += this.model.size + ' / ' + this.model.leafCount;
 			} else {
-				r += this.size;
+				r += this.model.size;
 			}
 			r += ')';
 			return r;
@@ -59,20 +70,23 @@ const Tree = {
 		  	if (this.isFolder) {
 		    	this.open = !this.open;
 		  	}
-			if (this.open === true && this.size > 0 && this.children.length === 0) {
-				request('/library/index',{ type: 'directory', sub: this.path})
+			if (this.open === true && this.model.size > 0 && !this.loaded) {
+				request('/library/index',{ type: 'directory', sub: this.model.path})
 				.then((res) => {
 					console.log("result",res);
-					this.children = res;
+					this.model.children = res;
+					this.loaded = true;
 				});
 			}
 		},
-		addToPlaylist: function (path) {
-			console.log("adding",this.path);
+		addToPlaylist: function (e) {
+			console.log("adding",this.model.path);
 			if (!currentList()) return;
+			this.justClicked = true;
+			setTimeout(() => { this.justClicked = false; },500);
 			request('/playlist/additems',{
 				id: currentList(),
-				value: this.path,
+				value: this.model.path,
 				type: 'directory'
 			})
 			.then((list) => {
@@ -83,6 +97,18 @@ const Tree = {
 			});
 		}
 	},
+	// watch: {
+	// 	searchValue: function(){
+	// 		console.log("searchvalue has changed to ",this.searchValue);
+	// 		if (this.searchValue === '') {
+	// 			this.loaded = false;
+	// 			if (this.open) {
+	// 				this.toggle();
+	// 				this.toggle();
+	// 			}
+	// 		}
+	// 	}
+	// },
 	components: {
 		tree: Tree
 	}
@@ -101,5 +127,15 @@ ul {
 	padding-left: 1em;
 	line-height: 1.4em;
 	list-style: none;
+}
+.item > div {
+	outline: 0px solid #fff;
+	outline-offset: 0;
+
+}
+.item > .animated {
+	outline-width: 1px;
+	outline-offset: 6px;
+	transition: outline-width 0.5s, outline-offset 0.5s;
 }
 </style>

@@ -1,21 +1,12 @@
 <template>
 	<main id="app">
-			<ul id="index">
-			  	<tree
-			    	class="item"
-			    	:path="tree.path"
-					:label="tree.label"
-					:size="999"
-					:leafCount="999">
-			  	</tree>
-			</ul>
-			<playlists></playlists>
-		</main>
+		<index></index>
+		<playlists></playlists>
 	</main>
 </template>
 
 <script>
-import Tree from './Tree.vue';
+import Index from './Index.vue';
 import Playlists from './Playlists.vue';
 export default {
   	name: 'app',
@@ -26,7 +17,7 @@ export default {
     	return d;
   	},
 	components: {
-		tree: Tree,
+		index: Index,
 		playlists: Playlists
 	}
 }
