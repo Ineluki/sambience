@@ -1,13 +1,11 @@
 {
-  "name": "musicserver",
+  "name": "Sambience",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "a music server",
+  "main": "Source/Server.js",
   "scripts": {
     "start": "node bin/server.js",
     "watchify": "watchify -vd -e Source/Browser.js -o Web/app.js",
-    "serve": "http-server -s -c 1 -a localhost",
-    "dev": "npm-run-all --parallel watchify start",
     "build": "cross-env NODE_ENV=production browserify -g envify Source/Browser.js | uglifyjs -c warnings=false -m > Web/app.js"
   },
   "keywords": [],
@@ -27,9 +25,7 @@
     "nedb": "^1.8.0",
     "play-sound": "^1.1.1",
     "sse-broadcast": "^0.4.1",
-    "symbol-tree": "^3.2.2",
     "vue": "^2.0.1",
-    "vue-context-menu": "^2.0.6",
     "vuedraggable": "^2.14.1"
   },
   "devDependencies": {
@@ -40,8 +36,6 @@
     "browserify-hmr": "^0.3.1",
     "cross-env": "^1.0.6",
     "envify": "^3.4.1",
-    "http-server": "^0.9.0",
-    "npm-run-all": "^2.1.2",
     "uglify-js": "^2.5.0",
     "vueify": "^9.1.0",
     "watchify": "^3.4.0"
