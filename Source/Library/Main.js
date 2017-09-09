@@ -1,6 +1,6 @@
 const Library = require('./Library.js');
 const Control = require('../Playback/Control.js');
-const debug = require('debug')('music');
+const debug = require('debug')('sambience');
 
 const lib = new Library();
 

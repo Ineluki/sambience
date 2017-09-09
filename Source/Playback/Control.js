@@ -1,5 +1,5 @@
 const Play = require('./Play.js');
-const debug = require('debug')('music');
+const debug = require('debug')('sambience');
 const Status = require('./Status.js');
 
 const methods = {};

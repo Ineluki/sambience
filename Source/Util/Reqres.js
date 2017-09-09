@@ -1,5 +1,5 @@
 const ExtendableError = require('./Error.js');
-const debug = require('debug')('music');
+const debug = require('debug')('sambience');
 const methods = {};
 
 methods.expectArguments = function(request,args) {

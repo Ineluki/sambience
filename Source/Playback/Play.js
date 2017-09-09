@@ -1,5 +1,5 @@
 const player = require('play-sound');
-const debug = require('debug')('music');
+const debug = require('debug')('sambience');
 
 const methods = {};
 

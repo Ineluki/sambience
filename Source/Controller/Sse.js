@@ -1,4 +1,5 @@
 const Status = require('../Playback/Status.js');
+const debug = require('debug')('sambience');
 
 module.exports = function(router) {
 

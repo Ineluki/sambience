@@ -1,4 +1,4 @@
-const debug = require('debug')('music');
+const debug = require('debug')('sambience');
 
 class IndexNode {
 

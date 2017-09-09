@@ -5,7 +5,7 @@ const session = require('koa-session');
 const URL = require('url');
 const path = require("path");
 const FS = require('fs');
-const debug = require('debug')('music');
+const debug = require('debug')('sambience');
 const app = new Koa();
 
 
