@@ -1,5 +1,7 @@
 const Nedb = require('nedb');
 const Playlist = require('../Model/Playlist.js');
+const Error = require('../Util/Error.js');
+const debug = require('debug')('sambience');
 
 class PlaylistStorage {
 
@@ -12,7 +14,7 @@ class PlaylistStorage {
 		  	autoload: true
 		});
 		this.playlists = new Map();
-		this.keys = ['_id','createdAt','updatedAt','name'];
+		this.keys = Playlist.META_KEYS;
 	}
 
 	getLists() {
@@ -54,7 +56,7 @@ class PlaylistStorage {
 			});
 			this.db.update({ _id: pl._id }, data, { upsert: true, multi: false, returnUpdatedDocs: true }, (err, numReplaced, data) => {
 				if (err) {
-					reject(err);
+					reject(new Error(err));
 				} else {
 					this.keys.forEach(key => {
 						pl[key] = data[key];
@@ -64,6 +66,18 @@ class PlaylistStorage {
 			});
 		});
 
+	}
+
+	delete(pl) {
+		return new Promise((resolve, reject) => {
+			let id = pl._id;
+			this.db.remove({ _id: id },{},(err,num) => {
+				debug("removed pl",id,err,num);
+				if (err) reject(new Error(err));
+				else if (num === 1) resolve({ ok: 1, deleted: id });
+				else reject(new Error("deleted "+num+", expected 1"));
+			});
+		});
 	}
 
 }

@@ -2,14 +2,26 @@
 	<div id="main">
 		<div id="header">
 			<playback></playback>
+			<modal v-if="showEditPlaylist" @close="showEditPlaylist = false">
+				<h3 slot="header">Playlist Edit</h3>
+				<div slot="body">
+					<input v-model="editPlaylistMeta.name"/>
+					<input v-model="editPlaylistMeta.delete" type="checkbox" value="1"/> Delete
+				</div>
+				<div slot="footer">
+					<button @click="savePlaylist">Save</button>
+				</div>
+			</modal>
 		</div>
 		<ul>
-			<li v-for="pl in playlistMeta"
-				@click="changeOpenList(pl._id)"
-				v-bind:class="{ active: (pl._id == currentList) }">
+			<li 	v-for="pl in playlistMeta"
+					@click="changeOpenList(pl._id)"
+					v-bind:class="{ active: (pl._id == currentList) }">
 				<span class="glyphicon glyphicon-play"
 					v-bind:class="{ invisible: (pl._id != playing.playlist) }"></span>
 				{{pl.name}}
+				<span class="btn glyphicon glyphicon-edit" @click="editPlaylist(pl)"></span>
+
 			</li>
 			<li @click="addPlaylist"> + </li>
 		</ul>
@@ -27,6 +39,8 @@ import Table from './Table.vue';
 import Playback from './Playback.vue';
 import {request,bus} from '../Browser/Backend.js';
 import {currentPlaylist} from '../Browser/Cache.js';
+import Modal from './Modal.vue';
+import Vue from 'vue';
 
 export default {
   	name: 'playlists',
@@ -62,6 +76,8 @@ export default {
     	return {
 			playing: {},
 			currentList: null,
+			editPlaylistMeta: null,
+			showEditPlaylist: false,
 			playlists: {},
 			playlistMeta: {},
 			playlistData: [],
@@ -73,6 +89,27 @@ export default {
 
 	},
 	methods: {
+		editPlaylist: function(pl) {
+			this.editPlaylistMeta = { delete: false };
+			Object.keys(pl).forEach(k => { this.editPlaylistMeta[k] = pl[k]; });
+			this.showEditPlaylist = true;
+		},
+		savePlaylist: function() {
+			console.log("save Playlist",this.editPlaylistMeta);
+			request('/playlist/save',{ obj: this.editPlaylistMeta })
+			.then((pl) => {
+				if (pl.deleted) {
+					Vue.delete( this.playlistMeta, pl.deleted );
+					if (pl.deleted === currentPlaylist()) {
+						let id = Object.keys(this.playlistMeta)[0];
+						if (id) this.changeOpenList(id);
+					}
+				} else {
+					this.playlistMeta[ pl._id ] = pl;
+				}
+				this.showEditPlaylist = false;
+			});
+		},
 		changeOpenList: function(id) {
 			if (this.currentList === id) return;
 			currentPlaylist(id);
@@ -92,13 +129,14 @@ export default {
 		addPlaylist: function() {
 			request('/playlist/create',{name: 'new pl'})
 			.then((pl) => {
-				this.playlistMeta[ pl._id ] = pl;
-			})
+				Vue.set(this.playlistMeta, pl._id, pl);
+			});
 		}
 	},
 	components: {
 		grid: Table,
-		playback: Playback
+		playback: Playback,
+		modal: Modal
 	}
 }
 </script>

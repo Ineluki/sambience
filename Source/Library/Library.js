@@ -19,11 +19,10 @@ class Library {
 	}
 
 	loadPlaylists() {
-		const _this = this;
 		return this.playlistStorage.getLists()
 		.then((lists) => {
 			lists.forEach((pl) => {
-				_this.playlists.set(pl._id,pl);
+				this.playlists.set(pl._id,pl);
 			});
 			return lists;
 		});
@@ -88,13 +87,21 @@ class Library {
 	getPlaylistOverview() {
 		let res = [];
 		this.playlists.forEach((pl) => {
-			res.push({ _id: pl._id, name: pl.name });
+			res.push(pl.getMeta());
 		});
 		return res;
 	}
 
 	savePlaylist(pl) {
 		return this.playlistStorage.save(pl);
+	}
+
+	deletePlaylist(pl) {
+		return this.playlistStorage.delete(pl)
+		.then((res) => {
+			this.playlists.delete(pl._id);
+			return res;
+		});
 	}
 
 }

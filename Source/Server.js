@@ -11,14 +11,14 @@ const app = new Koa();
 
 
 //session
-app.keys = ['[ohascpm9384yca39-48gm'];
-app.use(session(app));
-
-app.use(async (ctx,next) => {
-	var n = ctx.session.views || 0;
-	ctx.session.views = ++n;
-	await next();
-});
+// app.keys = ['[ohascpm9384yca39-48gm'];
+// app.use(session(app));
+//
+// app.use(async (ctx,next) => {
+// 	var n = ctx.session.views || 0;
+// 	ctx.session.views = ++n;
+// 	await next();
+// });
 
 //serve static pages, must come first of content
 app.use( serve( path.normalize(__dirname+'/../Web/'),{

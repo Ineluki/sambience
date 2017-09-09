@@ -192,6 +192,16 @@ class Playlist {
 		return res;
 	}
 
+	getMeta() {
+		const d = {};
+		Playlist.META_KEYS.forEach((k) => {
+			d[k] = this[k];
+		});
+		return d;
+	}
+
 }
+
+Playlist.META_KEYS = ['_id','createdAt','updatedAt','name'];
 
 module.exports = Playlist;

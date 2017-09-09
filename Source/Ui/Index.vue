@@ -47,7 +47,7 @@ export default {
 		loadRootLevel : function() {
 			request('/library/index',{ type: this.treeMode, sub: [] })
 			.then((res) => {
-				console.log("result",res);
+				//console.log("result",res);
 				this.tree.children = res;
 			});
 		},
