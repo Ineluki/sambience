@@ -22,3 +22,4 @@ Bugs
 ----
 
  - adding single files from index not working, only folders
+ - loaded data not refreshed when scan updates meta-data, currently have to restart server process (index, loaded playlists)

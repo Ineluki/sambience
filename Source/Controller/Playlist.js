@@ -53,6 +53,14 @@ methods['GET /movegroup'] = (params) => {
 };
 methods['GET /movegroup'].params = ['id','oldpos','newpos'];
 
+methods['GET /sort'] = (params) => {
+	let pl = Lib.getPlaylist(params.id);
+	pl.sort();
+	return Lib.savePlaylist(pl)
+	.then(() => { return pl; });
+};
+methods['GET /sort'].params = ['id'];
+
 methods['GET /removegroup'] = (params) => {
 	let pl = Lib.getPlaylist(params.id);
 	pl.removeGroup(params.pos);

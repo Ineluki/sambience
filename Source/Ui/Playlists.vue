@@ -13,16 +13,19 @@
 					<button @click="showEditPlaylist = false">Close</button>
 				</div>
 			</modal>
+			<context-menu id="context-menu" ref="plMenu">
+				<li @click="plMenuButton('sort')">Sort</li>
+				<li @click="plMenuButton('edit')">Edit</li>
+			</context-menu>
 		</div>
-		<ul>
+		<ul id="playlistTabs">
 			<li 	v-for="pl in playlistMeta"
 					@click="changeOpenList(pl._id)"
+					@contextmenu.prevent="plMenu($event,pl)"
 					v-bind:class="{ active: (pl._id == currentList) }">
 				<span class="glyphicon glyphicon-play"
 					v-bind:class="{ invisible: (pl._id != playing.playlist) }"></span>
 				{{pl.name}}
-				<span class="btn glyphicon glyphicon-edit" @click="editPlaylist(pl)"></span>
-
 			</li>
 			<li @click="addPlaylist"> + </li>
 		</ul>
@@ -42,6 +45,7 @@ import {request,bus} from '../Browser/Backend.js';
 import {currentPlaylist} from '../Browser/Cache.js';
 import Modal from './Modal.vue';
 import Vue from 'vue';
+import contextMenu from 'vue-context-menu';
 
 export default {
   	name: 'playlists',
@@ -132,29 +136,56 @@ export default {
 			.then((pl) => {
 				Vue.set(this.playlistMeta, pl._id, pl);
 			});
+		},
+		plMenu: function(e,pl) {
+			this.editPlaylistMeta = pl;
+			this.$refs.plMenu.open(e);
+		},
+		plMenuButton: function(action) {
+			switch(action) {
+				case 'sort':
+					let id = this.editPlaylistMeta._id;
+					request('/playlist/sort',{ id: id })
+					.then((list) => {
+						bus.$emit('playlist-update',{
+							id: id,
+							data: list
+						});
+					});
+				break;
+
+				case 'edit':
+					this.editPlaylist(this.editPlaylistMeta);
+				break;
+
+				default:
+					console.error("unknown action: "+action);
+				return;
+			}
 		}
 	},
 	components: {
 		grid: Table,
 		playback: Playback,
-		modal: Modal
+		modal: Modal,
+		contextMenu: contextMenu
 	}
 }
 </script>
 
 <style scoped>
-ul {
+#playlistTabs {
 	list-style: none;
 	padding: 0;
 	margin: 0;
 }
-li {
+#playlistTabs > li {
 	display: inline-block;
 	border: 1px solid #aaa;
 	padding: 2px;
 	cursor: pointer;
 }
-li.active {
+#playlistTabs > li.active {
 	background: #515;
 }
 </style>

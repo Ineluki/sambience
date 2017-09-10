@@ -25,7 +25,7 @@ class Playlist {
 		const sdef = this.sortDefinition;
 		for (let group of this.root) {
 			let resetPos = false;
-			if (this.currentPosition.parent === group) {
+			if (this.currentPosition && this.currentPosition.parent === group) {
 				resetPos = true;
 			}
 			let songs = group.removeAll();

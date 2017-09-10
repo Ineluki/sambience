@@ -193,6 +193,7 @@ class TreeNode {
 		}
 		this.firstChild = null;
 		this.lastChild = null;
+		this.size = 0;
 		return res;
 	}
 
