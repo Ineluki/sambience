@@ -9,10 +9,6 @@ module.exports = {
 		sse.subscribe( channelName, response );
 	},
 
-	// emit: function(evt,data) {
-	// 	sse.publish( channelName, evt, data);
-	// },
-
 	playback: function(data) {
 		sse.publish( channelName, 'playback', data );
 	},

@@ -1,4 +1,7 @@
-
+/**
+ * currently not in use
+ * @TODO cleanup or use
+ **/
 class File {
 	constructor(data) {
 		File.keys.forEach((key) => {

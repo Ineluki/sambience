@@ -1,4 +1,4 @@
-const TreeNode = require('./Tree/Node.js');
+const TreeNode = require('./TreeNode.js');
 
 class Playlist {
 

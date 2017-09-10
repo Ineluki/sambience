@@ -12,8 +12,6 @@ Features
 
  - song duration and timeline feedback
  - save playlist mode in playlist
- - scan from index
- - scan from bin
 
  - list transition for playlist songs
  - click effect for control btns
