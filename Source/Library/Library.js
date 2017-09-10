@@ -68,7 +68,7 @@ class Library {
 		if (this.scanning) return false;
 		debug("updating lib at "+path);
 		this.scanning = true;
-		let entries = this.storage.getReadStream({ file: { $regex: this.storage.getPathStartRegexp(path) } });
+		let entries = this.storage.getReadStream({ file: { $regex: this.storage.getPathStartRegexp(path,true) } });
 		let store = this.storage.getWriteStream();
 		let meta = new MetaScan();
 		this.emitProgress(entries,meta,store,'update',path);

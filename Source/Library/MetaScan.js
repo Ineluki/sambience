@@ -26,17 +26,18 @@ class MetaScan extends Transform {
 			});
 			if (!ending) return cb();
 		}
-		meta.parseFile(fullpath)
+		meta.parseFile(fullpath,{ duration: true })
 		.then((metadata) => {
-			//console.log("metadata for "+fullpath,metadata);
+			console.log("metadata for "+fullpath,metadata);
 			let data = {
 				file: fullpath,
-				artist: metadata.common.artist,
+				artist: metadata.common.albumartist ? metadata.common.albumartist : metadata.common.artist,
 				album: metadata.common.album,
 				title: metadata.common.title,
 				year: metadata.common.year,
 				tracknum: metadata.common.track.no,
-				disknum: metadata.common.disk.no
+				disknum: metadata.common.disk.no,
+				duration: ~~(metadata.format.duration)
 			};
 			this.emit('progress');
 			cb(null,data);
