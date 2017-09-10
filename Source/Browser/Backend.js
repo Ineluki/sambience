@@ -1,5 +1,6 @@
 import Vue from 'vue';
 const axios = require('axios');
+const Error = require('../Util/Error.js');
 
 const sse = new EventSource('/sse/');
 const bus = new Vue();
@@ -21,6 +22,11 @@ const request = function(action,params) {
 		method: 'GET',
 		url: action + (params ? `?__p=${JSON.stringify(params)}` : '')
 	}).then(result => {
+		if (result.data.error) {
+			let e = Error.fromJSON(result.data);
+			bus.$emit('error',e);
+			return Promise.reject(e);
+		}
 		return result.data;
 	});
 }

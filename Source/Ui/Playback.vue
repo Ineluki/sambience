@@ -25,17 +25,31 @@
 				<option value="3">Repeat</option>
 			</select>
 		</div>
+		<div class="log">
+			<div v-if="logLine">{{logLine.msg}}</div>
+			<div v-for="log in logHistory">{{log.msg}}</div>
+		</div>
 	</div>
 </template>
 
 <script>
-import {request} from '../Browser/Backend.js';
+import {request,bus} from '../Browser/Backend.js';
 export default {
   	name: 'playback',
   	data () {
 		let d = {
-			mode: 0
+			mode: 0,
+			logHistory: [],
+			logLine: null
 		};
+		bus.$on('scan',(data) => {
+			// console.log("scan",data);
+			if (data.finished) {
+				this.addLog(`${data.type} finished at ${data.path}`,'success',true);
+			} else {
+				this.addLog(`${data.type} progress: ${data.progress}`,'info',false);
+			}
+		});
     	return d;
   	},
 	methods: {
@@ -48,6 +62,20 @@ export default {
 		changeMode: function(e) {
 			//console.log("changeMode",this.mode);
 			request('/playback/setmode',{mode: this.mode});
+		},
+		addLog: function(msg,cls='info',history=true) {
+			if (this.logLine && this.logLine.history) {
+				this.logHistory.unshift(this.logLine);
+			}
+			this.logLine = {
+				msg: msg,
+				cls: cls,
+				history: history
+			};
+			const logLen = 10;
+			if (this.logHistory.length > logLen) {
+				this.logHistory = this.logHistory.slice( 0, logLen );
+			}
 		}
 	},
 	components: {

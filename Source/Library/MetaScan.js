@@ -38,9 +38,11 @@ class MetaScan extends Transform {
 				tracknum: metadata.common.track.no,
 				disknum: metadata.common.disk.no
 			};
+			this.emit('progress');
 			cb(null,data);
 		}).catch((err) => {
 			console.log("error reading metadata for "+fullpath,err);
+			this.emit('fail');
 			if (remove) {	//@TODO stops here for some reason. deletes entry but stream ends too
 				cb(null,{
 					file: fullpath,

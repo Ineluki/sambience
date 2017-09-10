@@ -4,7 +4,7 @@
 			<span @click="toggle" v-if="isFolder">
 				[{{opened ? '-' : '+'}}]
 			</span>
-			<span @dblclick="addToPlaylist">
+			<span @dblclick="addToPlaylist" @contextmenu.prevent="scanMenu($event,model)">
 				{{model.label}} {{sizes}}
 			</span>
 	    </div>
@@ -65,6 +65,9 @@ const Tree = {
 			}
 			r += ')';
 			return r;
+		},
+		showScan: function() {
+			return this.isFolder && this.treeMode === 'directory';
 		}
 	},
 	methods: {
@@ -96,6 +99,9 @@ const Tree = {
 					data: list
 				});
 			});
+		},
+		scanMenu: function(e,m) {
+			bus.$emit('scan-menu',e,m);
 		}
 	},
 	components: {

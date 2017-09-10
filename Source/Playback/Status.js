@@ -22,6 +22,7 @@ module.exports = {
 	},
 
 	error: function(data) {
+		console.log("Error",data);
 		sse.publish( channelName, 'error', data );
 	}
 }

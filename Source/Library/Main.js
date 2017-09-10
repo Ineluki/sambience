@@ -4,8 +4,8 @@ const debug = require('debug')('sambience');
 
 const lib = new Library();
 
-lib.loadPlaylists()
-.then((lists) => {
+lib.waitForPlaylists = lib.loadPlaylists();
+lib.waitForPlaylists.then((lists) => {
 	debug(lists.length+" playlists loaded");
 	lists.forEach((pl) => {
 		debug(`${pl.name} - ${pl.root.size}`);
@@ -17,8 +17,8 @@ lib.loadPlaylists()
 	console.log("error loading playlists",err);
 });
 
-lib.loadIndices()
-.then(() => {
+lib.waitForIndices = lib.loadIndices();
+lib.waitForIndices.then(() => {
 	debug("indices loaded");
 	// let index = lib.indices[Library.INDEX_DIR].root;
 	// debug(JSON.stringify(index));

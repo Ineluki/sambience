@@ -5,6 +5,10 @@
 			    <div class="bold">
 					{{treeMode}}
 			    </div>
+				<context-menu id="context-menu" ref="scanMenu">
+					<li @click="initScan('update')">Update Meta-Data</li>
+					<li @click="initScan('scan')">Scan for Files</li>
+				</context-menu>
 			    <ul>
 			      	<tree
 				        class="item"
@@ -30,7 +34,8 @@
 <script>
 import Tree from './Tree.vue';
 import debounce from 'lodash.debounce';
-import {request} from '../Browser/Backend.js';
+import {request,bus} from '../Browser/Backend.js';
+import contextMenu from 'vue-context-menu';
 
 export default {
   	name: 'index',
@@ -38,8 +43,14 @@ export default {
 		let d = {
 			tree: { children: [] },
 			treeMode: 'directory',
-			searchValue: ''
+			searchValue: '',
+			contextMenuModel: null
 		};
+		bus.$on('scan-menu',(e,m) => {
+			if (this.treeMode !== 'directory') return;
+			this.contextMenuModel = m;
+			this.$refs.scanMenu.open(e,m);
+		});
 		setTimeout(() => { this.loadRootLevel(); },100);
     	return d;
   	},
@@ -52,11 +63,11 @@ export default {
 			});
 		},
 		changeTreeType: function() {
-			console.log("changeTreeType",this.treeMode);
+			//console.log("changeTreeType",this.treeMode);
 			this.loadRootLevel();
 		},
 		filter: debounce(function() {
-			console.log("filter",this.searchValue);
+			//console.log("filter",this.searchValue);
 			if (this.searchValue.length === 0) {
 				return;
 			}
@@ -66,7 +77,11 @@ export default {
 			}).then((index) => {
 				this.tree.children = index;
 			});
-		},400)
+		},400),
+		initScan: function(type) {
+			//console.log("YAY update",this.contextMenuModel);
+			request('/library/index/scan',{ path: this.contextMenuModel.path, type: type });
+		}
 	},
 	watch: {
 		searchValue: function(newValue) {
@@ -78,7 +93,8 @@ export default {
 		}
 	},
 	components: {
-		tree: Tree
+		tree: Tree,
+		contextMenu: contextMenu
 	}
 }
 </script>

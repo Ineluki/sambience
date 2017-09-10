@@ -58,6 +58,17 @@ body,
 #playback {
 	display: flex;
 	flex-flow: row nowrap;
+	justify-content: space-between;
+    align-items: stretch;
+	> .controls {
+		flex-shrink: 0;
+	}
+	> .log {
+	    overflow-y: auto;
+	    font-size: 11px;
+	    font-family: monospace;
+	    max-height: 50px;
+	}
 }
 .hidden {
 	display: none;

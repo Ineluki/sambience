@@ -10,6 +10,7 @@
 				</div>
 				<div slot="footer">
 					<button @click="savePlaylist">Save</button>
+					<button @click="showEditPlaylist = false">Close</button>
 				</div>
 			</modal>
 		</div>

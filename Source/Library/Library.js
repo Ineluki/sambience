@@ -1,20 +1,22 @@
 const MetaScan = require("./MetaScan.js");
-const Walker = require('folder-reader');
+const Walker = require('folder-walker');
 const MetaStorage = require('./Storage.js');
 const PlaylistStorage = require('./PlaylistStorage.js');
 const Playlist = require('../Model/Playlist.js');
 const ArtistIndex = require('./Index/Artist.js');
 const DirectoryIndex = require('./Index/Directory.js');
+const debug = require('debug')('sambience');
+const Status = require('../Playback/Status.js');
+const debounce = require('lodash.debounce');
+const Error = require('../Util/Error.js');
 
 class Library {
 
-	constructor(path) {
-		this.path = path;
+	constructor() {
 		this.storage = new MetaStorage('Data/meta.db');
 		this.playlistStorage = new PlaylistStorage('Data/playlist.db',this.storage);
 		this.scanning = false;
 		this.playlists = new Map();
-
 		this.indices = new Map();
 	}
 
@@ -50,30 +52,60 @@ class Library {
 		})
 	}
 
-	scan() {
-		if (this.scanning) return;
-		const _this = this;
+	scan(path) {
+		if (this.scanning) return false;
+		debug("scanning at "+path);
 		this.scanning = true;
-		let walker = new Walker(this.path);
+		let walker = Walker(path);
 		let meta = new MetaScan();
 		let store = this.storage.getWriteStream();
 		walker.pipe(meta).pipe(store);
-		let endScan = function(e) {
-			if (e) console.log("ERROR: ",e);
-			_this.scanning = false;
+		this.emitProgress(walker,meta,store,'scan',path);
+		return true;
+	}
+
+	updateLib(path) {
+		if (this.scanning) return false;
+		debug("updating lib at "+path);
+		this.scanning = true;
+		let entries = this.storage.getReadStream({ file: { $regex: this.storage.getPathStartRegexp(path) } });
+		let store = this.storage.getWriteStream();
+		let meta = new MetaScan();
+		this.emitProgress(entries,meta,store,'update',path);
+		entries.pipe(meta).pipe(store);
+		return true;
+	}
+
+	emitProgress(walker,meta,store,type,path) {
+		let parsed = 0;
+		const emitUpdate = debounce(() => {
+			Status.scan({
+				type: type,
+				progress: parsed
+			});
+		},500,{ leading: true, maxWait: 500, trailing: false });
+		const endScan = (e) => {
+			debug("endScan",type,e);
+			if (e) {
+				Status.error(new Error(e));
+			}
+			this.scanning = false;
 			walker.destroy();
 			meta.destroy();
 			store.destroy();
+			Status.scan({
+				type: type,
+				finished: true,
+				path: path
+			});
 		};
+		meta.on('progress',() => {
+			parsed += 1;
+			debug("progress",parsed);
+			emitUpdate();
+		});
 		store.on('error',endScan);
-		store.on('end',endScan);
-	}
-
-	updateLib() {
-		let entries = this.storage.getReadStream({ file: { $regex: this.storage.getPathStartRegexp(this.path) } });
-		let store = this.storage.getWriteStream();
-		let meta = new MetaScan();
-		entries.pipe(meta).pipe(store);
+		store.on('finish',endScan);
 	}
 
 	getIndex(type) {

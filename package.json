@@ -15,7 +15,7 @@
     "axios": "^0.16.2",
     "bootstrap": "^3.3.7",
     "debug": "^3.0.1",
-    "folder-reader": "^1.1.0",
+    "folder-walker": "^3.1.0",
     "koa": "^2.3.0",
     "koa-better-router": "^2.1.1",
     "koa-session": "^5.5.0",
@@ -26,6 +26,7 @@
     "play-sound": "^1.1.1",
     "sse-broadcast": "^0.4.1",
     "vue": "^2.0.1",
+    "vue-context-menu": "^2.0.6",
     "vuedraggable": "^2.14.1"
   },
   "devDependencies": {

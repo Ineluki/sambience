@@ -1,5 +1,6 @@
 const Nedb = require('nedb');
 const {Readable,Writable} = require('stream');
+const debug = require('debug')('sambience');
 
 class MetaStore {
 
@@ -16,23 +17,23 @@ class MetaStore {
 	}
 
 	updateFile(data) {
-		const _this = this;
-		console.log("UPDATE "+JSON.stringify(data));
-		return new Promise(function(resolve, reject) {
+		return new Promise((resolve, reject) => {
 			if (data.remove && data.file) {
-				_this.db.remove({ file: data.file},{},(err,numRemoved) => {
+				debug("REMOVE "+JSON.stringify(data));
+				this.db.remove({ file: data.file },{},(err,numRemoved) => {
 					if (err) reject(err);
 					else resolve(numRemoved);
 				});
 			} else {
+				debug("UPDATE "+JSON.stringify(data));
 				let strippedData = {};
-				_this.keys.forEach((key) => {
+				this.keys.forEach((key) => {
 					strippedData[key] = key in data ? data[key] : null;
 				});
-				_this.db.update({ file: data.file }, strippedData, { upsert: true }, function (err, numReplaced, upsert) {
+				this.db.update({ file: data.file }, strippedData, { upsert: true }, function (err, numReplaced, upsert) {
 					if (err) reject(err);
 					else resolve(upsert);
-		 		});
+				});
 			}
 		});
 	}
