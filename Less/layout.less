@@ -6,10 +6,6 @@ body,
 }
 
 #app {
-	font-family: 'Avenir', Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	color: #2c3e50;
 
 	display: flex;
 	flex-flow: row nowrap;
@@ -17,8 +13,6 @@ body,
 }
 #header {
 	height: 50px;
-	background: #333;
-	color: #aaa;
 	flex-shrink: 0;
 }
 #main {
@@ -28,8 +22,6 @@ body,
 	align-items: stretch;
 	justify-content: flex-start;
 	> ul {
-		background: #333;
-		color: #aaa;
 		flex-shrink: 0;
 	}
 }
@@ -38,12 +30,9 @@ body,
 	overflow-y: auto;
 }
 #index {
-	background: #ccc;
 	margin: 0;
 	padding: 0;
-	max-width: 250px;
-	min-width: 150px;
-	font-size: 13px;
+	width: 40%;
 	display: flex;
 	flex-flow: column nowrap;
 	> ul {
@@ -58,7 +47,6 @@ body,
 #playback {
 	display: flex;
 	flex-flow: row nowrap;
-	justify-content: space-between;
     align-items: stretch;
 	> .controls {
 		flex-shrink: 0;
@@ -68,6 +56,10 @@ body,
 	    font-size: 11px;
 	    font-family: monospace;
 	    max-height: 50px;
+	}
+	> div {
+		margin-left: 12px;
+    	margin-top: 12px;
 	}
 }
 .hidden {
@@ -82,4 +74,17 @@ body,
 }
 .hoverable:hover > .invisible.reveal {
 	visibility: visible;
+}
+.vertical {
+    writing-mode:tb-rl;
+    -webkit-transform:rotate(90deg);
+    -moz-transform:rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform:rotate(90deg);
+    transform: rotate(90deg);
+    white-space:nowrap;
+    display:block;
+    bottom:0;
+    width:20px;
+    height:20px;
 }

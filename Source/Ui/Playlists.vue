@@ -181,11 +181,8 @@ export default {
 }
 #playlistTabs > li {
 	display: inline-block;
-	border: 1px solid #aaa;
 	padding: 2px;
 	cursor: pointer;
 }
-#playlistTabs > li.active {
-	background: #515;
-}
+
 </style>

@@ -2,9 +2,6 @@
 	<div id="index">
 		<ul>
 			<li>
-			    <div class="bold">
-					{{treeMode}}
-			    </div>
 				<context-menu id="context-menu" ref="scanMenu">
 					<li @click="initScan('update')">Update Meta-Data</li>
 					<li @click="initScan('scan')">Scan for Files</li>

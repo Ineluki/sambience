@@ -1,7 +1,7 @@
 <template>
 	<li>
 	    <div :class="{bold: isFolder, animated: justClicked}">
-			<span @click="toggle" v-if="isFolder">
+			<span @click="toggle" v-if="isFolder" class="opener">
 				[{{opened ? '-' : '+'}}]
 			</span>
 			<span @dblclick="addToPlaylist" @contextmenu.prevent="scanMenu($event,model)">
@@ -126,7 +126,6 @@ ul {
 .item > div {
 	outline: 0px solid #fff;
 	outline-offset: 0;
-
 }
 .item > .animated {
 	outline-width: 1px;

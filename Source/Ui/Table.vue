@@ -146,16 +146,7 @@ export default {
 </script>
 
 <style scoped>
-.playlist {
 
-}
-.playlist .group {
-	border: 1px solid #aad;
-}
-.group > header {
-	text-align: center;
-	background: rgba(200, 200, 220, 0.5);
-}
 header {
 	display: flex;
 	flex-flow: row nowrap;
