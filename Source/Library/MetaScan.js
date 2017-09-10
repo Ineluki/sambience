@@ -1,5 +1,6 @@
 const Transform = require('stream').Transform;
 const meta = require('music-metadata');
+const debug = require('debug')('sambience-meta');
 
 class MetaScan extends Transform {
 	constructor() {
@@ -7,28 +8,39 @@ class MetaScan extends Transform {
 			objectMode: true
 		});
 		this.allowedEndings = [
-			'.mp3','.flac','.wav','.ogg'
+			'.mp3','.flac','.wav'
 		];
+		this.busy = false;
 	}
 
 	_transform(obj,enc,cb) {
+		if (this.busy) {
+			return false;
+		}
+		this.busy = true;
 		var fullpath;
 		var remove = false;
 		if (obj.file && obj._id) {	//SOURCE DB
 			fullpath = obj.file;
 			remove = true;
 		} else {					//SOURCE WALKER
-			let name = obj.basename;
+			let name = obj.filepath;
 			fullpath = obj.filepath;
-			if (obj.type !== 'file') return cb();
+			debug("~~~ "+fullpath);
+
 			let ending = this.allowedEndings.find((e) => {
 				return name.substr(name.length-e.length,e.length) === e;
 			});
-			if (!ending) return cb();
+			if (!ending) {
+				this.busy = false;
+				debug("skip bc ending ");
+				return cb();
+			}
 		}
-		meta.parseFile(fullpath,{ duration: true })
+		meta.parseFile(fullpath,{ duration: true, skipCovers: true })
 		.then((metadata) => {
-			console.log("metadata for "+fullpath,metadata);
+			this.busy = false;
+			debug("metadata done ",fullpath);
 			let data = {
 				file: fullpath,
 				artist: metadata.common.albumartist ? metadata.common.albumartist : metadata.common.artist,
@@ -42,7 +54,7 @@ class MetaScan extends Transform {
 			this.emit('progress');
 			cb(null,data);
 		}).catch((err) => {
-			console.log("error reading metadata for "+fullpath,err);
+			debug("###ERROR### reading metadata for "+fullpath,err);
 			this.emit('fail');
 			if (remove) {	//@TODO stops here for some reason. deletes entry but stream ends too
 				cb(null,{
@@ -50,9 +62,15 @@ class MetaScan extends Transform {
 					remove: true
 				});
 			} else {
-				cb(err);
+				cb();
 			}
-		});
+		}).then(() => {
+			this.busy = false;
+			if (this.isPaused()) {
+				console.log("PAUSED");
+				this.unpause();
+			}
+		})
 	}
 }
 

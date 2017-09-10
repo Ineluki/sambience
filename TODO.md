@@ -17,7 +17,7 @@ Features
  - list transition for playlist songs
  - click effect for control btns
  - fav icon(s?)
- - config for server (DB location, type)
+ - config for server (DB location, type; allowed file endings)
 
 Bugs
 ----

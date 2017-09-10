@@ -83,6 +83,7 @@ class MetaStore {
 			objectMode: true,
 			write: function(data,enc,cb) {
 				_this.updateFile(data).then(() => { cb(); }, (err) => { cb(err); });
+				return true;
 			}
 		});
 	}
@@ -100,8 +101,7 @@ class MetaStore {
 		});
 		const r = new Readable({
 			objectMode: true,
-			read: function(cb) {
-			}
+			read: function(cb) { }
 		});
 		return r;
 	}

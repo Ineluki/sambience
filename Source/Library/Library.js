@@ -1,5 +1,5 @@
 const MetaScan = require("./MetaScan.js");
-const Walker = require('folder-walker');
+const FolderScan = require('./FolderScan.js');
 const MetaStorage = require('./Storage.js');
 const PlaylistStorage = require('./PlaylistStorage.js');
 const Playlist = require('../Model/Playlist.js');
@@ -56,11 +56,16 @@ class Library {
 		if (this.scanning) return false;
 		debug("scanning at "+path);
 		this.scanning = true;
-		let walker = Walker(path);
+		let walker = new FolderScan(path);
 		let meta = new MetaScan();
 		let store = this.storage.getWriteStream();
 		walker.pipe(meta).pipe(store);
-		this.emitProgress(walker,meta,store,'scan',path);
+		walker.on('end',(r) => { console.log("walker end",r); });
+		walker.on('error',(r) => { console.log("walker error",r); });
+		meta.on('end',(r) => { console.log("meta end",r); });
+		meta.on('finish',(r) => { console.log("meta finish",r); });
+		meta.on('error',(r) => { console.log("meta error",r); });
+		// this.emitProgress(walker,meta,store,'scan',path);
 		return true;
 	}
 
