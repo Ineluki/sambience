@@ -18,7 +18,7 @@ class MetaScan extends Transform {
 	handleError({ fullpath, err }) {
 		debug("###ERROR### reading metadata for "+fullpath,err);
 		this.emit('fail');
-		if (this.updateMode) {	//@TODO stops here for some reason. deletes entry but stream ends too
+		if (this.updateMode) {
 			return Promise.resolve({
 				file: fullpath,
 				remove: true
@@ -62,12 +62,13 @@ class MetaScan extends Transform {
 
 	handleUpdateObj(obj) {
 		return new Promise(function(resolve, reject) {
+			// debug("update",obj);
 			let fullpath = obj.file;
 			let filename = obj.file.substr( obj.file.lastIndexOf('/')+1 );
-			FS.fstat(fullpath,(err,stat) => {
+			FS.stat(fullpath,(err,stat) => {
 				if (err) reject(err);
-				else if (stat.isFile()) resolve([filename,fullpath]);
-				else reject(new Error("not a file"));
+				else if (stat.isFile()) resolve({ filename, fullpath });
+				else reject({ fullpath, error: new Error("not a file") });
 			});
 		});
 	}
@@ -102,18 +103,22 @@ class MetaScan extends Transform {
 	}
 
 	_transform(obj,enc,cb) {
-		if (this.busy) {
-			//return false;
-		}
 		this.busy += 1;
 		let p = Promise.resolve(obj);
+		if (this.updateMode) {
+			p = p.then(this.handleUpdateObj.bind(this))
+			.then(this.runMeta.bind(this))
+			.then(this.createFileData.bind(this))
+			.catch(this.handleError.bind(this));
+		} else {
+			p = p.then(this.handleScanObj.bind(this))
+			.then(res => {
+				return this.runMeta(res)
+				.then(this.createFileData.bind(this));
+			});
+		}
 
-		p.then(this.handleScanObj.bind(this))
-		.then(res => {
-			return this.runMeta(res)
-			.then(this.createFileData.bind(this));
-		})
-		.then(res => {
+		p.then(res => {
 			// debug("done",res);
 			cb(null,res);
 		},err => {
