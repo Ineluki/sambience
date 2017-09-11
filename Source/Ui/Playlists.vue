@@ -16,6 +16,7 @@
 			<context-menu id="context-menu" ref="plMenu">
 				<li @click="plMenuButton('sort')">Sort</li>
 				<li @click="plMenuButton('edit')">Edit</li>
+				<li @click="plMenuButton('delete')">Delete</li>
 			</context-menu>
 		</div>
 		<ul id="playlistTabs">
@@ -29,7 +30,7 @@
 			</li>
 			<li @click="addPlaylist"> + </li>
 		</ul>
-		<grid
+		<grid v-if="playlistData"
 			:columns="gridColumns"
 			:group-columns="groupColumns"
 			:data="playlistData"
@@ -53,15 +54,19 @@ export default {
 		request('/playlist/')
 		.then((data) => {
 			let d = {};
-			data.forEach((pl) => {
-				d[ pl._id ] = pl;
-			});
-			this.playlistMeta = d;
-			if (!currentPlaylist()) {
-				let id = Object.keys(this.playlistMeta)[0];
-				if (id) this.changeOpenList(id);
+			if (data.length) {
+				data.forEach((pl) => {
+					d[ pl._id ] = pl;
+				});
+				this.playlistMeta = d;
+				if (!currentPlaylist()) {
+					let id = Object.keys(this.playlistMeta)[0];
+					if (id) this.changeOpenList(id);
+				} else {
+					this.changeOpenList(currentPlaylist());
+				}
 			} else {
-				this.changeOpenList(currentPlaylist());
+				this.addPlaylist();
 			}
 		});
 		bus.$on('playlist-update',(res) => {
@@ -105,9 +110,13 @@ export default {
 			.then((pl) => {
 				if (pl.deleted) {
 					Vue.delete( this.playlistMeta, pl.deleted );
-					if (pl.deleted === currentPlaylist()) {
-						let id = Object.keys(this.playlistMeta)[0];
-						if (id) this.changeOpenList(id);
+					delete(this.playlistMeta[pl.deleted]);
+					if (Object.keys(this.playlistMeta).length === 0) {
+						this.addPlaylist();
+					} else {
+						if (pl.deleted === currentPlaylist()) {
+							this.changeOpenList(Object.keys(this.playlistMeta)[0]);
+						}
 					}
 				} else {
 					this.playlistMeta[ pl._id ] = pl;
@@ -119,7 +128,7 @@ export default {
 			if (this.currentList === id) return;
 			currentPlaylist(id);
 			this.currentList = id;
-			if (typeof this.playlists[this.currentList] === 'undefined') {
+			if (id && typeof this.playlists[this.currentList] === 'undefined') {
 				request('/playlist/get',{ id: this.currentList })
 				.then((list) => {
 					bus.$emit('playlist-update',{
@@ -132,9 +141,10 @@ export default {
 			}
 		},
 		addPlaylist: function() {
-			request('/playlist/create',{name: 'new pl'})
+			request('/playlist/create',{name: 'Playlist'})
 			.then((pl) => {
 				Vue.set(this.playlistMeta, pl._id, pl);
+				this.changeOpenList(pl._id);
 			});
 		},
 		plMenu: function(e,pl) {
@@ -156,6 +166,11 @@ export default {
 
 				case 'edit':
 					this.editPlaylist(this.editPlaylistMeta);
+				break;
+
+				case 'delete':
+					this.editPlaylistMeta.delete = 1;
+					this.savePlaylist();
 				break;
 
 				default:
