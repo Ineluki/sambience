@@ -25,6 +25,7 @@
 							<span v-for="key in columns">
 								{{entry[key]}}
 							</span>
+							<timeFormat :sec="entry.duration"></timeFormat>
 							<span class="invisible reveal">
 								<div class="btn glyphicon glyphicon-remove-sign" @click="removeSong(grpIndex,entryIndex)">
 								</div>
@@ -41,6 +42,7 @@
 <script>
 import Vue from 'vue'
 import draggable from 'vuedraggable';
+import Time from './Time.vue';
 import {request, bus} from '../Browser/Backend.js';
 import {currentPlaylist} from '../Browser/Cache.js';
 export default {
@@ -113,34 +115,10 @@ export default {
 				});
 			});
 		}
-
-		// beforeEnter: function (el) {
-		// 	el.style.opacity = 0
-		// 	el.style.height = 0
-		// },
-		// enter: function (el, done) {
-		// 	var delay = el.dataset.index * 150
-		// 	setTimeout(function () {
-		// 		Velocity(
-		// 			el,
-		// 			{ opacity: 1, height: '1.6em' },
-		// 			{ complete: done }
-		// 		)
-		// 	}, delay)
-		// },
-		// leave: function (el, done) {
-		// 	var delay = el.dataset.index * 150
-		// 	setTimeout(function () {
-		// 		Velocity(
-		// 			el,
-		// 			{ opacity: 0, height: 0 },
-		// 			{ complete: done }
-		// 		)
-		// 	}, delay)
-		// }
 	},
 	components: {
-		draggable
+		draggable,
+		timeFormat: Time
 	}
 }
 </script>

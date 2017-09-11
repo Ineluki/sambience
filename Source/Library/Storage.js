@@ -12,7 +12,7 @@ class MetaStore {
 		  	autoload: true
 		});
 		this.keys = [
-			'file','artist','album','title','year','disknum','tracknum'
+			'file','artist','album','title','year','disknum','tracknum','duration'
 		];
 	}
 

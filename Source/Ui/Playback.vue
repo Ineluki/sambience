@@ -39,6 +39,10 @@ export default {
   	data () {
 		let d = {
 			mode: 0,
+			status: {
+				began: 0,
+				duration: 0
+			},
 			logHistory: [],
 			logLine: null
 		};
@@ -48,6 +52,15 @@ export default {
 				this.addLog(`${data.type} finished at ${data.path}`,'success',true);
 			} else {
 				this.addLog(`${data.type} progress: ${data.progress}`,'info',false);
+			}
+		});
+		bus.$on('playback',(data) => {
+			if (data.type === 'started') {
+				this.status.began = data.began;
+				this.status.duration = data.duration;
+			} else {
+				this.status.began = 0;
+				this.status.duration = 0;
 			}
 		});
     	return d;
@@ -76,6 +89,12 @@ export default {
 			if (this.logHistory.length > logLen) {
 				this.logHistory = this.logHistory.slice( 0, logLen );
 			}
+		}
+	},
+	computed: {
+		statusDuration: function() {
+			let sec = this.status.began ? Date.now() - this.status.began : 0;
+			return `${sec} / ${this.status.duration}`;
 		}
 	},
 	components: {

@@ -68,6 +68,8 @@ function playNext() {
 	Status.playback({
 		type: 'start',
 		song: meta._id,
+		duration: meta.duration,
+		began: Date.now(),
 		playlist: playlist.getId()
 	});
 	return Play.start(meta.file);
