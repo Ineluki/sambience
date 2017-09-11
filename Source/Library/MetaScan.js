@@ -1,76 +1,132 @@
 const Transform = require('stream').Transform;
-const meta = require('music-metadata');
+const meta = require('musicmetadata');
+const FS = require('fs');
 const debug = require('debug')('sambience-meta');
+const Error = require('../Util/Error.js');
+
 
 class MetaScan extends Transform {
-	constructor() {
+	constructor(opts) {
 		super({
 			objectMode: true
 		});
-		this.allowedEndings = [
-			'.mp3','.flac','.wav'
-		];
-		this.busy = false;
+		this.updateMode = !!opts.update;
+		this.allowedEndings = opts.allowedEndings;
+		this.busy = 0;
+	}
+
+	handleError({ fullpath, err }) {
+		debug("###ERROR### reading metadata for "+fullpath,err);
+		this.emit('fail');
+		if (this.updateMode) {	//@TODO stops here for some reason. deletes entry but stream ends too
+			return Promise.resolve({
+				file: fullpath,
+				remove: true
+			});
+		} else {
+			return Promise.resolve();
+		}
+	}
+
+	createFileData({ filename, fullpath, metadata }) {
+		debug("metadata done ",fullpath);
+		let data = {
+			file: fullpath,
+			artist: metadata.albumartist.length ? metadata.albumartist[0] : metadata.artist[0],
+			album: metadata.album,
+			title: metadata.title,
+			year: metadata.year,
+			tracknum: metadata.track.no,
+			disknum: metadata.disk.no,
+			duration: ~~(metadata.duration)
+		};
+		if (!data.title) {
+			data.title = filename;
+		}
+		if (!data.album) {
+			data.album = 'Misc';
+		}
+		if (!data.artist) {
+			data.artist = 'Unknown';
+		}
+		if (data.artist.map && data.artist.length) {
+			data.artist = data.artist[0];
+		}
+		return data;
+	}
+
+	handleHasNoTag({ filename, fullpath }) {
+		let metadata = { track: {}, disk: {}, artist: [], albumartist: [] };
+		return { filename, fullpath, metadata };
+	}
+
+	handleUpdateObj(obj) {
+		return new Promise(function(resolve, reject) {
+			let fullpath = obj.file;
+			let filename = obj.file.substr( obj.file.lastIndexOf('/')+1 );
+			FS.fstat(fullpath,(err,stat) => {
+				if (err) reject(err);
+				else if (stat.isFile()) resolve([filename,fullpath]);
+				else reject(new Error("not a file"));
+			});
+		});
+	}
+
+	handleScanObj(obj) {
+		return new Promise((resolve, reject) => {
+			let filename = obj.filepath.substr( obj.filepath.lastIndexOf('/')+1 ).toLowerCase();
+			let fullpath = obj.filepath;
+			let ending = this.allowedEndings.find((e) => {
+				return filename.substr(filename.length-e.length,e.length) === e;
+			});
+			if (!ending) reject(new Error("invalid ending on "+filename));
+			else resolve({ filename, fullpath });
+		});
+	}
+
+	runMeta({ filename, fullpath }) {
+		return new Promise((resolve, reject) => {
+			debug("~~~ "+fullpath,this.busy);
+			let readStream = FS.createReadStream(fullpath);
+			meta(readStream,{ duration: true },(err,metadata) => {
+				readStream.close();
+				if (err) {
+					debug("ERROR parsing: ",filename, err);
+					resolve( this.handleHasNoTag({ filename, fullpath }) );
+				} else {
+					// debug("found metadata",metadata);
+					resolve({ filename, fullpath, metadata });
+				}
+			});
+		});
 	}
 
 	_transform(obj,enc,cb) {
 		if (this.busy) {
-			return false;
+			//return false;
 		}
-		this.busy = true;
-		var fullpath;
-		var remove = false;
-		if (obj.file && obj._id) {	//SOURCE DB
-			fullpath = obj.file;
-			remove = true;
-		} else {					//SOURCE WALKER
-			let name = obj.filepath;
-			fullpath = obj.filepath;
-			debug("~~~ "+fullpath);
+		this.busy += 1;
+		let p = Promise.resolve(obj);
 
-			let ending = this.allowedEndings.find((e) => {
-				return name.substr(name.length-e.length,e.length) === e;
-			});
-			if (!ending) {
-				this.busy = false;
-				debug("skip bc ending ");
-				return cb();
-			}
-		}
-		meta.parseFile(fullpath,{ duration: true, skipCovers: true })
-		.then((metadata) => {
-			this.busy = false;
-			debug("metadata done ",fullpath);
-			let data = {
-				file: fullpath,
-				artist: metadata.common.albumartist ? metadata.common.albumartist : metadata.common.artist,
-				album: metadata.common.album,
-				title: metadata.common.title,
-				year: metadata.common.year,
-				tracknum: metadata.common.track.no,
-				disknum: metadata.common.disk.no,
-				duration: ~~(metadata.format.duration)
-			};
-			this.emit('progress');
-			cb(null,data);
-		}).catch((err) => {
-			debug("###ERROR### reading metadata for "+fullpath,err);
-			this.emit('fail');
-			if (remove) {	//@TODO stops here for some reason. deletes entry but stream ends too
-				cb(null,{
-					file: fullpath,
-					remove: true
-				});
-			} else {
-				cb();
-			}
+		p.then(this.handleScanObj.bind(this))
+		.then(res => {
+			return this.runMeta(res)
+			.then(this.createFileData.bind(this));
+		})
+		.then(res => {
+			// debug("done",res);
+			cb(null,res);
+		},err => {
+			debug("skip bc err "+err);
+			cb();
 		}).then(() => {
-			this.busy = false;
+			this.busy -= 1;
 			if (this.isPaused()) {
-				console.log("PAUSED");
-				this.unpause();
+				debug("UNPAUSE");
+				this.resume();
 			}
 		})
+
 	}
 }
 

@@ -54,16 +54,18 @@ class FolderScan extends Readable {
 		if (this.fileBuffer.length > 0) {
 			this.push({ filepath: this.fileBuffer.pop() });
 		} else {
+			debug("FOLDER READ ENDS");
 			this.push(null);
 		}
 
 	}
 
 	_read(size) {
-		if (!this.busy) {
-			debug("read",size);
+		if (true || !this.busy) {
 			if (this.fileBuffer.length > 0) {
-				this.push({ filepath: this.fileBuffer.pop() });
+				let file = this.fileBuffer.pop();
+				debug("push "+file);
+				this.push({ filepath: file });
 				return true;
 			}
 			this.busy = true;

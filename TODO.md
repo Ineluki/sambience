@@ -18,6 +18,8 @@ Features
  - click effect for control btns
  - fav icon(s?)
  - config for server (DB location, type; allowed file endings)
+ - non-existing files create status msg error and skip playback
+ - single add btn instead of dbl-click, similar to remove btn
 
 Bugs
 ----

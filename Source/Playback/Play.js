@@ -1,4 +1,4 @@
-const player = require('play-sound');
+const player = require('play-sound')();
 const debug = require('debug')('sambience');
 
 const methods = {};
@@ -8,22 +8,26 @@ let audio;
 methods.start = function(file) {
 	methods.stop();
 	return new Promise(function(resolve, reject) {
-		debug("playing "+file);
-		audio = setTimeout(resolve,3300);
-		return;
-		audio = player.play(file, function(err){
-			audio = null;
-			if (err && !err.killed) reject(err);
-			else resolve();
+		let audioLocal;
+		audioLocal = audio = player.play(file, function(err) {
+			if (err && !err.killed) {
+				reject(err);
+			} else {
+				debug("stopped",audioLocal ? audioLocal.pid : 0, audio ? audio.pid : 0, audioLocal === audio ? 'same' : '');
+				if (audioLocal === audio) {
+					resolve();
+				}
+			}
 		});
+		debug("playing "+file,audio.pid);
 	});
 };
 
 methods.stop = function() {
-	debug("stop play");
+
 	if (audio) {
-		clearTimeout(audio);
-		//audio.kill();
+		debug("stop play", audio ? audio.pid : 0);
+		audio.kill();
 		audio = null;
 	}
 };

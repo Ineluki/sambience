@@ -9,6 +9,7 @@ const debug = require('debug')('sambience');
 const Status = require('../Playback/Status.js');
 const debounce = require('lodash.debounce');
 const Error = require('../Util/Error.js');
+const Config = require('../Util/Config.js');
 
 class Library {
 
@@ -57,7 +58,10 @@ class Library {
 		debug("scanning at "+path);
 		this.scanning = true;
 		let walker = new FolderScan(path);
-		let meta = new MetaScan();
+		let meta = new MetaScan({
+			update: false,
+			allowedEndings: Config.get('library.allowedFileExtensions')
+		});
 		let store = this.storage.getWriteStream();
 		walker.pipe(meta).pipe(store);
 		walker.on('end',(r) => { console.log("walker end",r); });
@@ -75,7 +79,10 @@ class Library {
 		this.scanning = true;
 		let entries = this.storage.getReadStream({ file: { $regex: this.storage.getPathStartRegexp(path,true) } });
 		let store = this.storage.getWriteStream();
-		let meta = new MetaScan();
+		let meta = new MetaScan({
+			update: true,
+			allowedEndings: Config.get('library.allowedFileExtensions')
+		});
 		this.emitProgress(entries,meta,store,'update',path);
 		entries.pipe(meta).pipe(store);
 		return true;

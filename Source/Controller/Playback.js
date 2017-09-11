@@ -1,5 +1,6 @@
 const ReqRes = require('../Util/Reqres.js');
 const Control = require('../Playback/Control.js');
+const Lib = require('../Library/Main.js');
 
 const methods = {};
 

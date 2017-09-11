@@ -17,7 +17,10 @@ class ArtistIndex extends AbstractIndex {
 		return new Promise((resolve, reject) => {
 			let read = this.storage.getReadStream({})
 			.on('data',i => { this.addPath(i); })
-			.on('end',resolve)
+			.on('end',() => {
+				this.root.sort();
+				resolve();
+			})
 			.on('error',e => { reject(e); });
 		});
 	}

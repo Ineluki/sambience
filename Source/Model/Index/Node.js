@@ -100,6 +100,13 @@ class IndexNode {
 		return this;
 	}
 
+	sort() {
+		this.childArr.sort((a,b) => {
+			return a.label  > b.label ? 1 : -1;
+		});
+		this.childArr.forEach((c) => { c.sort(); });
+	}
+
 	toJSON() {
 		return {
 			label: this.label,

@@ -79,10 +79,11 @@ class MetaStore {
 
 	getWriteStream() {
 		const _this = this;
+		let progress = 0;
 		return new Writable({
 			objectMode: true,
 			write: function(data,enc,cb) {
-				_this.updateFile(data).then(() => { cb(); }, (err) => { cb(err); });
+				_this.updateFile(data).then(() => { debug("progress",++progress); cb(); }, (err) => { cb(err); });
 				return true;
 			}
 		});

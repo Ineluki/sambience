@@ -8,12 +8,13 @@
     "watchify": "watchify -vd -e Source/Browser.js -o Web/app.js",
     "build": "cross-env NODE_ENV=production browserify -g envify Source/Browser.js | uglifyjs -c warnings=false -m > Web/app.js"
   },
-  "keywords": [],
+  "keywords": ["music","server","rpi","hifi-station","playlist","web-ui"],
   "author": "Stormking <sturmspitze@googlemail.com>",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.16.2",
     "bootstrap": "^3.3.7",
+    "conf": "^1.2.0",
     "debug": "^3.0.1",
     "folder-walker": "^3.1.0",
     "koa": "^2.3.0",
@@ -21,7 +22,7 @@
     "koa-session": "^5.5.0",
     "koa-static": "^4.0.1",
     "lodash.debounce": "^4.0.8",
-    "music-metadata": "^0.8.0",
+    "musicmetadata": "^2.0.5",
     "nedb": "^1.8.0",
     "play-sound": "^1.1.1",
     "sse-broadcast": "^0.4.1",

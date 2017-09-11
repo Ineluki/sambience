@@ -23,6 +23,7 @@ function keepPlaying() {
 }
 
 function moveQueueForward() {
+	if (!playing) return;
 	let next;
 	switch(mode) {
 		case methods.MODE_NORMAL:
@@ -82,31 +83,27 @@ methods.start = function() {
 methods.stop = function() {
 	if (playing) {
 		playing = false;
-		Play.stop();
 		Status.playback({ type: 'stop' });
+		Play.stop();
 	}
 };
 
 methods.jumpNext = function() {
-	methods.stop();
+	methods.stop()
 	if (playlist.moveToNextSong()) {
 		methods.start();
-		return true;
 	}
-	return false;
 };
 methods.jumpPrev = function() {
 	methods.stop();
 	if (playlist.moveToPrevSong()) {
 		methods.start();
-		return true;
 	}
-	return false;
 };
 
 methods.jumpNextGroup = function() {
-	let moved;
 	methods.stop();
+	let moved;
 	if (mode === methods.MODE_RANDOM_GROUP) {
 		moved = playlist.moveToRandomGroup();
 	} else {
@@ -114,18 +111,14 @@ methods.jumpNextGroup = function() {
 	}
 	if (moved) {
 		methods.start();
-		return true;
 	}
-	return false;
 };
 
 methods.setPosition = function(grp,song) {
 	methods.stop();
 	if (playlist.moveToPosition(grp,song)) {
 		methods.start();
-		return true;
 	}
-	return false;
 };
 
 methods.setPlaylist = function(pl) {

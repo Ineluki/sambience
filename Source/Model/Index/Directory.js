@@ -24,6 +24,7 @@ class DirectoryIndex extends AbstractIndex {
 			})
 			.on('end',() => {
 				this.root = this.root.findRoot();
+				this.root.sort();
 				resolve();
 			})
 			.on('error',e => { reject(e); });

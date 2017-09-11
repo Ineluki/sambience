@@ -1,0 +1,10 @@
+{
+	"database": {
+		"type":"nedb",
+		"music":"./Data/meta.db",
+		"playlist":"./Data/playlist.db"
+	},
+	"library": {
+		"allowedFileExtensions": [".mp3",".flac",".wav",".ogg"]
+	}
+}
