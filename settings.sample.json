@@ -6,5 +6,8 @@
 	},
 	"library": {
 		"allowedFileExtensions": [".mp3",".flac",".wav",".ogg"]
+	},
+	"playback": {
+		"player": "mplayer"
 	}
 }
