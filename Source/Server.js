@@ -6,19 +6,9 @@ const URL = require('url');
 const path = require("path");
 const FS = require('fs');
 const debug = require('debug')('sambience');
+const listenPort = require('../Source/Util/Config.js').get('core.port',8080);
 const app = new Koa();
 
-
-
-//session
-// app.keys = ['[ohascpm9384yca39-48gm'];
-// app.use(session(app));
-//
-// app.use(async (ctx,next) => {
-// 	var n = ctx.session.views || 0;
-// 	ctx.session.views = ++n;
-// 	await next();
-// });
 
 //serve static pages, must come first of content
 app.use( serve( path.normalize(__dirname+'/../Web/'),{
@@ -43,6 +33,8 @@ FS.readdirSync(path.normalize(__dirname+'/Controller/')).forEach((entry) => {
 
 
 
-app.listen(8080,() => {
-	debug("listening on 8080");
+app.listen(listenPort,() => {
+	debug(`listening on port ${listenPort}`);
 });
+
+module.exports = app;

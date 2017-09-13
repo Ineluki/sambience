@@ -9,5 +9,8 @@
 	},
 	"playback": {
 		"player": "mplayer"
+	},
+	"core": {
+		"port" : 8080
 	}
 }

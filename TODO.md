@@ -28,3 +28,4 @@ Bugs
  - loaded data not refreshed when scan updates meta-data, currently have to restart server process (index, loaded playlists)
  - search for eternal, cannot add files or deepest folder
  - playback error after several min: Error: stdout maxBuffer exceeded
+ - switch index type and back and reopening a formerly open folder reveals nothing anymore

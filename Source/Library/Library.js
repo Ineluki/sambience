@@ -14,8 +14,8 @@ const Config = require('../Util/Config.js');
 class Library {
 
 	constructor() {
-		this.storage = new MetaStorage('Data/meta.db');
-		this.playlistStorage = new PlaylistStorage('Data/playlist.db',this.storage);
+		this.storage = new MetaStorage( Config.get('database.music') );
+		this.playlistStorage = new PlaylistStorage( Config.get('database.playlist'), this.storage );
 		this.scanning = false;
 		this.playlists = new Map();
 		this.indices = new Map();
@@ -64,12 +64,7 @@ class Library {
 		});
 		let store = this.storage.getWriteStream();
 		walker.pipe(meta).pipe(store);
-		walker.on('end',(r) => { console.log("walker end",r); });
-		walker.on('error',(r) => { console.log("walker error",r); });
-		meta.on('end',(r) => { console.log("meta end",r); });
-		meta.on('finish',(r) => { console.log("meta finish",r); });
-		meta.on('error',(r) => { console.log("meta error",r); });
-		// this.emitProgress(walker,meta,store,'scan',path);
+		this.emitProgress(walker,meta,store,'scan',path);
 		return true;
 	}
 

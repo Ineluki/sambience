@@ -14,8 +14,7 @@ methods.start = function(file) {
 			if (err && !err.killed) {
 				reject(err);
 			} else {
-				debug("stopped",audioLocal ? audioLocal.pid : 0, audio ? audio.pid : 0,
-						audioLocal === audio ? 'same' : '');
+				debug("stopped",audioLocal ? audioLocal.pid : 0);
 				if (audioLocal === audio) {
 					resolve();
 				}
@@ -33,7 +32,7 @@ methods.start = function(file) {
 
 methods.stop = function() {
 	if (audio) {
-		debug("stop play", audio ? audio.pid : 0);
+		debug("stoping", audio ? audio.pid : 0);
 		audio.kill();
 		audio = null;
 	}
