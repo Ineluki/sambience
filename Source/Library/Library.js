@@ -10,6 +10,7 @@ const Status = require('../Playback/Status.js');
 const debounce = require('lodash.debounce');
 const Error = require('../Util/Error.js');
 const Config = require('../Util/Config.js');
+const pump = require('pump');
 
 class Library {
 
@@ -40,6 +41,14 @@ class Library {
 		return Promise.all(waitFor);
 	}
 
+	reload() {
+		debug("reloading lib");
+		this.waitForPlaylists = this.loadPlaylists();
+		this.waitForIndices = this.loadIndices();
+
+		return Promise.all([this.waitForPlaylists, this.waitForIndices]);
+	}
+
 	createPlaylist(name) {
 		const _this = this;
 		let pl = new Playlist();
@@ -63,7 +72,6 @@ class Library {
 			allowedEndings: Config.get('library.allowedFileExtensions')
 		});
 		let store = this.storage.getWriteStream();
-		walker.pipe(meta).pipe(store);
 		this.emitProgress(walker,meta,store,'scan',path);
 		return true;
 	}
@@ -79,13 +87,13 @@ class Library {
 			allowedEndings: Config.get('library.allowedFileExtensions')
 		});
 		this.emitProgress(entries,meta,store,'update',path);
-		entries.pipe(meta).pipe(store);
 		return true;
 	}
 
 	emitProgress(walker,meta,store,type,path) {
 		let parsed = 0;
 		const emitUpdate = debounce(() => {
+			debug("emitting",parsed);
 			Status.scan({
 				type: type,
 				progress: parsed
@@ -97,22 +105,20 @@ class Library {
 				Status.error(new Error(e));
 			}
 			this.scanning = false;
-			walker.destroy();
-			meta.destroy();
-			store.destroy();
+
 			Status.scan({
 				type: type,
 				finished: true,
 				path: path
 			});
+			this.reload();
 		};
 		meta.on('progress',() => {
 			parsed += 1;
 			debug("progress",parsed);
 			emitUpdate();
 		});
-		store.on('error',endScan);
-		store.on('finish',endScan);
+		pump(walker,meta,store,endScan);
 	}
 
 	getIndex(type) {

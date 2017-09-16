@@ -16,7 +16,7 @@ class FolderScan extends Readable {
 
 	fillBuffer() {
 		if (this.dirBuffer.length === 0) {
-			return;
+			return false;
 		}
 		let dir = this.dirBuffer.pop();
 		debug("readdir",dir);
@@ -42,13 +42,19 @@ class FolderScan extends Readable {
 				this.pushFiles();
 			},(err) => { this.emit('error',err); });
 		});
+		return true;
 	}
 
 	pushFiles() {
 		debug("pushFiles",this.fileBuffer.length, this.dirBuffer.length);
 
 		if (this.fileBuffer.length === 0) {
-			return this.fillBuffer();
+			let filled = this.fillBuffer();
+			if (!filled) {
+				debug("FOLDER READ ENDS");
+				this.push(null);
+			}
+			return;
 		}
 		this.busy = false;
 		if (this.fileBuffer.length > 0) {

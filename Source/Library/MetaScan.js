@@ -52,6 +52,7 @@ class MetaScan extends Transform {
 		if (data.artist.map && data.artist.length) {
 			data.artist = data.artist[0];
 		}
+		this.emit('progress');
 		return data;
 	}
 
@@ -61,12 +62,11 @@ class MetaScan extends Transform {
 	}
 
 	handleUpdateObj(obj) {
+		let fullpath = obj.file;
+		let filename = fullpath.substr( fullpath.lastIndexOf('/')+1 );
 		return new Promise(function(resolve, reject) {
-			// debug("update",obj);
-			let fullpath = obj.file;
-			let filename = obj.file.substr( obj.file.lastIndexOf('/')+1 );
-			FS.stat(fullpath,(err,stat) => {
-				if (err) reject(err);
+			FS.stat(fullpath,(error,stat) => {
+				if (error) reject({ fullpath, error });
 				else if (stat.isFile()) resolve({ filename, fullpath });
 				else reject({ fullpath, error: new Error("not a file") });
 			});

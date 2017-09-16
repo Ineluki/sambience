@@ -31,6 +31,7 @@
     "lodash.debounce": "^4.0.8",
     "musicmetadata": "^2.0.5",
     "nedb": "^1.8.0",
+    "pump": "^1.0.2",
     "sse-broadcast": "^0.4.1",
     "vue": "^2.0.1",
     "vue-context-menu": "^2.0.6",

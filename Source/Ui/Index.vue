@@ -61,6 +61,7 @@ export default {
 		},
 		changeTreeType: function() {
 			//console.log("changeTreeType",this.treeMode);
+			this.tree.children = [];
 			this.loadRootLevel();
 		},
 		filter: debounce(function() {

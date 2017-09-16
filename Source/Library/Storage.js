@@ -39,7 +39,7 @@ class MetaStore {
 	}
 
 	getPathStartRegexp(path,subdirs=false) {
-		path = path.replace(/[\.\[\]\(\)\-\+\*\?]/g,'\\$0');
+		path = path.replace(/[\.\[\]\(\)\-\+\*\?]/g,'\\$&');
 		return new RegExp('^'+path+(subdirs ? '' : '[^\/]+$'));
 	}
 
@@ -49,6 +49,7 @@ class MetaStore {
 		//console.log("searchByPath",reg);
 		return new Promise(function(resolve, reject) {
 			_this.db.find({ file: { $regex: reg }},(err,docs) => {
+				debug("path found "+docs.length,reg);
 				if (err) reject(err);
 				else resolve(docs);
 			});
@@ -83,7 +84,7 @@ class MetaStore {
 		return new Writable({
 			objectMode: true,
 			write: function(data,enc,cb) {
-				_this.updateFile(data).then(() => { debug("progress",++progress); cb(); }, (err) => { cb(err); });
+				_this.updateFile(data).then(() => { debug("stored",++progress); cb(); }, (err) => { cb(err); });
 				return true;
 			}
 		});
