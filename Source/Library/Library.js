@@ -63,7 +63,7 @@ class Library {
 	}
 
 	scan(path) {
-		if (this.scanning) return false;
+		if (this.scanning) return Promise.reject(new Error("already scanning"));
 		debug("scanning at "+path);
 		this.scanning = true;
 		let walker = new FolderScan(path);
@@ -72,8 +72,7 @@ class Library {
 			allowedEndings: Config.get('library.allowedFileExtensions')
 		});
 		let store = this.storage.getWriteStream();
-		this.emitProgress(walker,meta,store,'scan',path);
-		return true;
+		return this.emitProgress(walker,meta,store,'scan',path);
 	}
 
 	updateLib(path) {
@@ -86,39 +85,44 @@ class Library {
 			update: true,
 			allowedEndings: Config.get('library.allowedFileExtensions')
 		});
-		this.emitProgress(entries,meta,store,'update',path);
-		return true;
+		return this.emitProgress(entries,meta,store,'update',path);
 	}
 
 	emitProgress(walker,meta,store,type,path) {
-		let parsed = 0;
-		const emitUpdate = debounce(() => {
-			debug("emitting",parsed);
-			Status.scan({
-				type: type,
-				progress: parsed
+		return new Promise((resolve, reject) => {
+			let parsed = 0;
+			const emitUpdate = debounce(() => {
+				debug("emitting",parsed);
+				Status.scan({
+					type: type,
+					progress: parsed
+				});
+			},500,{ leading: true, maxWait: 500, trailing: false });
+			const endScan = (e) => {
+				debug("endScan",type,e);
+				this.scanning = false;
+				Status.scan({
+					type: type,
+					finished: true,
+					path: path
+				});
+				if (e) {
+					this.reload();
+					let err = new Error("error during scan/update",34343,e);
+					Status.error(err);
+					reject(err);
+				} else {
+					this.reload()
+					.then(resolve,reject);
+				}
+			};
+			meta.on('progress',() => {
+				parsed += 1;
+				debug("progress",parsed);
+				emitUpdate();
 			});
-		},500,{ leading: true, maxWait: 500, trailing: false });
-		const endScan = (e) => {
-			debug("endScan",type,e);
-			if (e) {
-				Status.error(new Error(e));
-			}
-			this.scanning = false;
-
-			Status.scan({
-				type: type,
-				finished: true,
-				path: path
-			});
-			this.reload();
-		};
-		meta.on('progress',() => {
-			parsed += 1;
-			debug("progress",parsed);
-			emitUpdate();
+			pump(walker,meta,store,endScan);
 		});
-		pump(walker,meta,store,endScan);
 	}
 
 	getIndex(type) {

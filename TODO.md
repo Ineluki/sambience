@@ -10,6 +10,7 @@ Design
 Features
 --------
 
+ - config opt for initial scan if lib is empty
 
 Bugs
 ----
