@@ -5,10 +5,13 @@
 		"playlist":"./Data/playlist.db"
 	},
 	"library": {
-		"allowedFileExtensions": [".mp3",".flac",".wav",".ogg"]
+		"allowedFileExtensions": [".mp3",".flac",".wav",".ogg"],
+		"baseDirs": [
+			"/home/user/Music"
+		]
 	},
 	"playback": {
-		"player": "mplayer"
+		"player": "gst123"
 	},
 	"core": {
 		"port" : 8080
