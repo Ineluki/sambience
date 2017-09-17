@@ -26,9 +26,12 @@ methods.start = function(file) {
 		};
 		let audioLocal;
 		audioLocal = audio = spawn(player, [file], {
-			stdio: 'ignore',
+			stdio: 'pipe',
 			detached: false
 		});
+		//we do this instead of ignore pipes because some programs (gst123) dont start properly on ignore
+		audioLocal.stdout.on('data',() => {});
+		audioLocal.stderr.on('data',() => {});
 		audioLocal.on('close',closed);
 		debug("playing "+file,audio.pid);
 	});

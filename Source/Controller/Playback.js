@@ -23,7 +23,7 @@ methods['GET /setmode'].params = ['mode'];
 
 
 methods['GET /setposition'] = function(params) {
-	if (Control.getPlaylist().getId() !== params.playlist) {
+	if (!Control.getPlaylist() || Control.getPlaylist().getId() !== params.playlist) {
 		let pl = Lib.getPlaylist(params.playlist);
 		if (!pl) return Promise.reject(new Error("unknown playlist: "+params.playlist));
 		Control.setPlaylist(pl);
