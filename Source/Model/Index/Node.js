@@ -76,7 +76,12 @@ class IndexNode {
 	}
 
 	getPathMatchesFilter(filter) {
-		return (this.getFullPath().join(" ")).toLowerCase().indexOf(filter) > -1;
+		let path = this.isLeaf() ? this.getPath() : this.getFullPath().join(" ");
+		return path.toLowerCase().indexOf(filter) > -1;
+	}
+
+	isLeaf() {
+		return this.childArr.length === 0;
 	}
 
 	getMatchCount(filter) {
@@ -87,9 +92,13 @@ class IndexNode {
 				return 1;
 			}
 		} else {
-			return this.childArr.map((n) => {
-				return n.getMatchCount(filter);
-			}).reduce((v,c) => { return c+v; },0);
+			if (this.isLeaf()) {
+				return 0;
+			} else {
+				return this.childArr.map((n) => {
+					return n.getMatchCount(filter);
+				}).reduce((v,c) => { return c+v; },0);
+			}
 		}
 	}
 
@@ -140,7 +149,9 @@ class IndexNode {
 				leafCount: leafs,
 				children: []
 			};
-			data.children = c.getFilteredView(filter);
+			if (leafs <= 200) {
+				data.children = c.getFilteredView(filter);
+			}
 			return data;
 		}).filter(c => { return c !== null; });
 	}

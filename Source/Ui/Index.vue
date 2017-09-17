@@ -53,6 +53,7 @@ export default {
   	},
 	methods: {
 		loadRootLevel : function() {
+			this.tree.children = [];
 			request('/library/index',{ type: this.treeMode, sub: [] })
 			.then((res) => {
 				//console.log("result",res);
@@ -60,8 +61,6 @@ export default {
 			});
 		},
 		changeTreeType: function() {
-			//console.log("changeTreeType",this.treeMode);
-			this.tree.children = [];
 			this.loadRootLevel();
 		},
 		filter: debounce(function() {
@@ -69,6 +68,7 @@ export default {
 			if (this.searchValue.length === 0) {
 				return;
 			}
+			this.tree.children = [];
 			request('/library/index/filter',{
 				type: this.treeMode,
 				search: this.searchValue

@@ -10,8 +10,6 @@ Design
 Features
 --------
 
- - single add btn instead of dbl-click, similar to remove btn
- - index filter: if too many items, abort; for files only show if path matches not fullpath
  - auto sort after adding group but only that group
  - remove meta from db when playback recognizes file is gone
 

@@ -1,8 +1,7 @@
 <template>
 	<li>
 	    <div :class="{bold: isFolder, animated: justClicked}" class="hoverable entry" @contextmenu.prevent="scanMenu($event,model)">
-			<span @click="toggle" v-if="isFolder" class="opener">
-				[{{opened ? '-' : '+'}}]
+			<span @click="toggle" v-if="isFolder" class="opener" v-html="openerSign">
 			</span>
 			<span>
 				{{model.label}}
@@ -51,10 +50,20 @@ const Tree = {
 		};
 		if (this.searchValue.length) {
 			d.open = true;
+			d.loaded = true;
 		}
 		return d;
 	},
 	computed: {
+		openerSign: function() {
+			if (this.searchValue.length) {
+				return '[&times;]';
+			} else if (this.open) {
+				return '[-]';
+			} else {
+				return '[+]';
+			}
+		},
 		opened: function() {
 			if (this.searchValue.length) return true;
 			return this.open;
