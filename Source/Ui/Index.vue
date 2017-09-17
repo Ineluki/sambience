@@ -1,7 +1,7 @@
 <template>
 	<div id="index">
 		<ul>
-			<li>
+			<li class="item">
 				<context-menu id="context-menu" ref="scanMenu">
 					<li @click="initScan('update')">Update Meta-Data</li>
 					<li @click="initScan('scan')">Scan for Files</li>
@@ -99,7 +99,7 @@ export default {
 
 <style scoped>
 ul {
-	list-stype: none;
+	list-style: none;
 	margin: 0;
 	padding: 0;
 }

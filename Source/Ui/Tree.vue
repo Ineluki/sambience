@@ -1,11 +1,18 @@
 <template>
 	<li>
-	    <div :class="{bold: isFolder, animated: justClicked}">
+	    <div :class="{bold: isFolder, animated: justClicked}" class="hoverable entry" @contextmenu.prevent="scanMenu($event,model)">
 			<span @click="toggle" v-if="isFolder" class="opener">
 				[{{opened ? '-' : '+'}}]
 			</span>
-			<span @dblclick="addToPlaylist" @contextmenu.prevent="scanMenu($event,model)">
-				{{model.label}} {{sizes}}
+			<span>
+				{{model.label}}
+			</span>
+			<span>
+				{{sizes}}
+			</span>
+			<span class="invisible reveal">
+				<div class="btn glyphicon glyphicon-share-alt add" @click="addToPlaylist">
+				</div>
 			</span>
 	    </div>
 	    <ul v-show="opened" v-if="isFolder">
@@ -59,7 +66,7 @@ const Tree = {
 			if (this.model.leafCount === 0 || this.model.size === 0) return '';
 			let r = '(';
 			if (this.model.leafCount > this.model.size) {
-				r += this.model.size + ' / ' + this.model.leafCount;
+				r += this.model.size + '/' + this.model.leafCount;
 			} else {
 				r += this.model.size;
 			}
@@ -112,7 +119,7 @@ export default Tree;
 </script>
 
 <style scoped>
-.item {
+.opener, .add {
   	cursor: pointer;
 }
 .bold {
@@ -131,5 +138,19 @@ ul {
 	outline-width: 1px;
 	outline-offset: 6px;
 	transition: outline-width 0.5s, outline-offset 0.5s;
+}
+.entry {
+	display: flex;
+	flex-flow: row nowrap;
+}
+.entry > span {
+	flex-shrink: 1;
+	flex-grow: 0;
+}
+.entry > span:nth-child(2) {
+	flex-grow: 1;
+}
+.entry > span:nth-child(3) {
+	flex-grow: 0;
 }
 </style>
