@@ -1,6 +1,7 @@
 const Play = require('./Play.js');
 const debug = require('debug')('sambience');
 const Status = require('./Status.js');
+const Error = require('../Util/Error.js');
 
 const methods = {};
 
@@ -17,8 +18,8 @@ function keepPlaying() {
 	.then(moveQueueForward)
 	.then(keepPlaying)
 	.catch((err) => {
-		playing = false;
-		console.error(err);
+		console.error("error during keepPlaying",err);
+		methods.stop();
 	});
 }
 
@@ -47,12 +48,12 @@ function moveQueueForward() {
 		break;
 
 		default:
-			throw new Error("unknown mode: "+JSON.stringify(mode));
+			return Promise.reject(new Error("unknown mode: "+JSON.stringify(mode)));
 	}
 	let moved = next();
 	if (!moved) {
-		debug("unable to move to next song");
-		return Promise.reject();
+		debug("unable to move to next song. probably end of playlist");
+		return Promise.reject(new Error("unable to move to next song"));
 	} else {
 		debug("moved to next song in mode "+mode);
 		return Promise.resolve();
@@ -62,8 +63,7 @@ function moveQueueForward() {
 function playNext() {
 	let meta = playlist.getCurrentSong();
 	if (!meta) {
-		debug("end of playlist reached");
-		return Promise.resolve();
+		return Promise.reject(new Error("no current song to play"));
 	}
 	Status.playback({
 		type: 'start',
@@ -77,6 +77,7 @@ function playNext() {
 
 methods.start = function() {
 	if (!playing) {
+		debug("starting");
 		playing = true;
 		keepPlaying();
 	}
@@ -84,14 +85,19 @@ methods.start = function() {
 
 methods.stop = function() {
 	if (playing) {
+		debug("stopping");
 		playing = false;
-		Status.playback({ type: 'stop' });
+		Status.playback({
+			type: 'stop',
+			began: Date.now(),
+			playlist: playlist ? playlist.getId() : null
+		});
 		Play.stop();
 	}
 };
 
 methods.jumpNext = function() {
-	methods.stop()
+	methods.stop();
 	if (playlist.moveToNextSong()) {
 		methods.start();
 	}
@@ -129,7 +135,7 @@ methods.setPlaylist = function(pl) {
 
 methods.getPlaylist = function() {
 	return playlist;
-}
+};
 
 methods.setMode = function(m) {
 	mode = m;

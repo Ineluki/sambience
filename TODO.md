@@ -10,7 +10,6 @@ Design
 Features
 --------
 
- - save playlist mode in playlist
  - status after reload not set (current song)
  - list transition for playlist songs
  - click effect for control btns

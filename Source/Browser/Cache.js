@@ -3,11 +3,15 @@ const store = localStorage;
 
 const methods = {};
 
-methods.currentPlaylist = function(set=null) {
-	if (set !== null) {
-		store.setItem('currentList',set);
+const createMethod = function(key) {
+	methods[key] = function(set=null) {
+		if (set !== null) {
+			store.setItem(key,set);
+		}
+		return store.getItem(key);
 	}
-	return store.getItem('currentList');
-}
+};
+
+['playlistMode','currentPlaylist'].forEach(key => { createMethod(key); });
 
 module.exports = methods;

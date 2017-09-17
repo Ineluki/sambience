@@ -83,6 +83,7 @@ export default {
 				this.playing = {};
 			}
 		});
+		// request('/playback/status');
     	return {
 			playing: {},
 			currentList: null,

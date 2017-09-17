@@ -34,6 +34,7 @@
 
 <script>
 import {request,bus} from '../Browser/Backend.js';
+import {playlistMode} from '../Browser/Cache.js';
 export default {
   	name: 'playback',
   	data () {
@@ -46,6 +47,10 @@ export default {
 			logHistory: [],
 			logLine: null
 		};
+		if (playlistMode()) {
+			d.mode = playlistMode();
+			setTimeout(() => { this.changeMode(); },100);
+		}
 		bus.$on('scan',(data) => {
 			// console.log("scan",data);
 			if (data.finished) {
@@ -72,9 +77,9 @@ export default {
 				cmd: cmd
 			});
 		},
-		changeMode: function(e) {
-			//console.log("changeMode",this.mode);
+		changeMode: function() {
 			request('/playback/setmode',{mode: this.mode});
+			playlistMode(this.mode);
 		},
 		addLog: function(msg,cls='info',history=true) {
 			if (this.logLine && this.logLine.history) {
