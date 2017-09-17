@@ -17,9 +17,7 @@ methods['GET /additems'] = (params) => {
 	let index = Lib.getIndex(params.type);
 	return index.handleInput(params.value)
 	.then((items) => {
-		items.forEach((item) => {
-			pl.addFile(item);
-		});
+		pl.addMultiple(items);
 		return Lib.savePlaylist(pl)
 		.then(() => { return pl; });
 	});

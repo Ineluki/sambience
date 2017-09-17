@@ -22,27 +22,32 @@ class Playlist {
 		if (typeof def !== 'undefined') {
 			this.sortDefinition = def;
 		}
-		const sdef = this.sortDefinition;
 		for (let group of this.root) {
 			let resetPos = false;
 			if (this.currentPosition && this.currentPosition.parent === group) {
 				resetPos = true;
 			}
 			let songs = group.removeAll();
-			songs.sort((a,b) => {
-				for(let i=0, ii=sdef.length; i<ii; i++) {
-					let va = a[sdef[i]],
-						vb = b[sdef[i]];
-					if (va < vb) return -1;
-					if (va > vb) return 1;
-				}
-				return 0;
-			});
+			songs = this.sortArr(songs);
 			group.addAll(songs);
 			if (resetPos) {
 				this.currentPosition = group.firstChild;
 			}
 		}
+	}
+
+	sortArr(songs) {
+		const sdef = this.sortDefinition;
+		songs.sort((a,b) => {
+			for(let i=0, ii=sdef.length; i<ii; i++) {
+				let va = a[sdef[i]],
+					vb = b[sdef[i]];
+				if (va < vb) return -1;
+				if (va > vb) return 1;
+			}
+			return 0;
+		});
+		return songs;
 	}
 
 	addFile(file) {
@@ -62,6 +67,12 @@ class Playlist {
 		return true;
 	}
 
+	addMultiple(items) {
+		items = this.sortArr(items);
+		items.forEach((item) => {
+			this.addFile(item);
+		});
+	}
 
 	getGroupKey(file) {
 		let res = '';
@@ -174,6 +185,8 @@ class Playlist {
 		if (this.currentPosition && this.currentPosition.parent === node) {
 			this.currentPosition = node.next ? node.getNext().firstChild : null;
 		}
+		let grpKey = node.content._key;
+		this.groupMap.delete(grpKey);
 		this.root.removeChild(node);
 	}
 
