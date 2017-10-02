@@ -20,4 +20,9 @@ function changeFavicon(playing) {
 
 bus.$on('playback',(data) => {
 	changeFavicon(data.type === 'start');
+	if (data.title) {
+		document.title = data.title;
+	} else {
+		document.title = 'Sambience';
+	}
 });

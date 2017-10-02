@@ -2,6 +2,7 @@ const Play = require('./Play.js');
 const debug = require('debug')('sambience');
 const Status = require('./Status.js');
 const Error = require('../Util/Error.js');
+const Song = require('../Model/File.js');
 
 const methods = {};
 
@@ -65,9 +66,11 @@ function playNext() {
 	if (!meta) {
 		return Promise.reject(new Error("no current song to play"));
 	}
+	let song = new Song(meta);
 	Status.playback({
 		type: 'start',
 		song: meta._id,
+		title: song.getFullTitle(),
 		duration: meta.duration,
 		began: Date.now(),
 		playlist: playlist.getId()
