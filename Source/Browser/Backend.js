@@ -20,7 +20,7 @@ sse.onerror = function(e) {
 const request = function(action,params) {
 	return axios({
 		method: 'GET',
-		url: action + (params ? `?__p=${JSON.stringify(params)}` : '')
+		url: action + (params ? `?__p=${encodeURIComponent( JSON.stringify(params) )}` : '')
 	}).then(result => {
 		if (result.data.error) {
 			let e = Error.fromJSON(result.data);

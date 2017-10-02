@@ -4,10 +4,15 @@ const methods = {};
 
 methods.expectArguments = function(request,args) {
 	let res = {};
-	let data = request.query.__p ? JSON.parse(request.query.__p) : {};
+	let data;
+	try {
+		data = request.query.__p ? JSON.parse(request.query.__p) : {};
+	} catch (e) {
+		throw new ExtendableError("invalid json",1506955035,{ json: request.query.__p });
+	}
 	args.forEach((arg) => {
 		if (!(arg in request.query) && !(arg in data)) {
-			throw new ExtendableError("missing argument",13232,arg);
+			throw new ExtendableError("missing argument",1506554035,arg);
 		}
 		res[arg] = arg in data ? data[arg] : request.query[arg];
 	});
