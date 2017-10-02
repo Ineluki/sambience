@@ -10,13 +10,15 @@ After trying out a dozen MPD and Mopidy frontends I was disappointed that none h
 
 This is specifically for setting up a hifi station on an RPI and allowing it to play endlessly through a selection of albums.
 
-In other words this is for people who...
+This is for you if you...
 
  * want to setup a playlist and let it shuffle endlessly through albums
- * scoff on software volume control
- * listen to whole songs, and don't skip ahead or back
- * keep their own music library instead of streaming music
+ * do not need software volume control
+ * keep your own music library instead of using streaming services
  * want to control a music player from various devices
+
+ ![Screenshot](./screen.png "Screenshot")
+
 
 ### Features
 
@@ -64,7 +66,10 @@ docker run \
 
 ### Custom
 
+Requires Node.js, tested with v8.4+
+
 * `npm install` to install dependencies
+* `npm run build` to build UI
 * `cp settings.sample.json settings.json` and change content as needed depending on your env
 * `npm run start` to start the server process
 

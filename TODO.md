@@ -1,8 +1,6 @@
 TODO
 ====
 
- - find and handle @TODOs
-
 Design
 ------
 
@@ -15,6 +13,7 @@ Bugs
 ----
 
  - loaded data not refreshed when scan updates meta-data, currently have to reload browser
+ - firefox caches page, resulting in e.g. missing pl tab until F5
 
 
 Later Features
@@ -27,3 +26,5 @@ Later Features
  - list of files with incomplete metadata
  - write metadata to file from app
  - better UI performance for playlists > 1000 items
+ - support for mongodb storage
+ - playback statistics
