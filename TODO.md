@@ -14,6 +14,8 @@ Bugs
 
  - loaded data not refreshed when scan updates meta-data, currently have to reload browser
  - firefox caches page, resulting in e.g. missing pl tab until F5
+ - SSE unreliable in ffs
+ - next group in random song mode causes stop (working as intended but could be better)
 
 
 Later Features

@@ -6,6 +6,10 @@ const channelName = 'default';
 
 let latestStatus = null;
 
+setInterval(() => {
+	sse.publish( channelName, 'keepalive', { time: Date.now(), ok: true } );
+},1000 * 55);
+
 module.exports = {
 	subscribe: function(response) {
 		sse.subscribe( channelName, response );

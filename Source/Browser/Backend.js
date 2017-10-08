@@ -2,20 +2,24 @@ import Vue from 'vue';
 const axios = require('axios');
 const Error = require('../Util/Error.js');
 
-const sse = new EventSource('/sse/');
+var sse;
 const bus = new Vue();
 
 let bindEvents = ['playback','scan','error'];
-bindEvents.forEach(event => {
-	sse.addEventListener(event,function(e) {
-		let data = JSON.parse(e.data);
-		bus.$emit(event,data);
+function initSse() {
+	sse = new EventSource('/sse/');
+	bindEvents.forEach(event => {
+		sse.addEventListener(event,function(e) {
+			let data = JSON.parse(e.data);
+			bus.$emit(event,data);
+		});
 	});
-});
+	sse.onerror = function(e) {
+		console.error("see-error",e);
+	};
+}
 
-sse.onerror = function(e) {
-	console.error("see-error",e);
-};
+initSse();
 
 const request = function(action,params) {
 	return axios({
