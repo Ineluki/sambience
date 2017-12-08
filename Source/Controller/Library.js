@@ -4,16 +4,13 @@ const Lib = require('../Library/Main.js');
 const methods = {};
 
 methods['GET /index'] = function(params) {
-	let index = Lib.getIndex(params.type);
-	let data = index.getIndex(params.sub).getView();
-	return data;
+	return Lib.getStorage().getIndexView(params.type,params.sub);
 };
 methods['GET /index'].params = ['type','sub'];
 
 
 methods['GET /index/filter'] = function(params) {
-	let index = Lib.getIndex(params.type);
-	let data = index.getIndex([]).getFilteredView(params.search);
+	let data = Lib.getStorage().getIndexSearch(params.type,params.search);
 	return data;
 };
 methods['GET /index/filter'].params = ['search','type'];

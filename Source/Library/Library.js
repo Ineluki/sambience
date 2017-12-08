@@ -1,10 +1,6 @@
 const MetaScan = require("./MetaScan.js");
 const FolderScan = require('./FolderScan.js');
-const MetaStorage = require('./Storage.js');
-const PlaylistStorage = require('./PlaylistStorage.js');
 const Playlist = require('../Model/Playlist.js');
-const ArtistIndex = require('../Model/Index/Artist.js');
-const DirectoryIndex = require('../Model/Index/Directory.js');
 const debug = require('debug')('sambience');
 const Status = require('../Playback/Status.js');
 const debounce = require('lodash.debounce');
@@ -14,52 +10,18 @@ const pump = require('pump');
 
 class Library {
 
-	constructor() {
-		this.storage = new MetaStorage( Config.get('database.music') );
-		this.playlistStorage = new PlaylistStorage( Config.get('database.playlist'), this.storage );
+	constructor(storage) {
 		this.scanning = false;
-		this.playlists = new Map();
-		this.indices = new Map();
+		this.storage = storage;
+		this.initPromise = null;
+		this.waitForInit();
 	}
 
-	loadPlaylists() {
-		return this.playlistStorage.getLists()
-		.then((lists) => {
-			lists.forEach((pl) => {
-				this.playlists.set(pl._id,pl);
-			});
-			return lists;
-		});
-	}
-
-	loadIndices() {
-		let waitFor = [];
-		this.indices[Library.INDEX_DIR] = new DirectoryIndex(this.storage);
-		waitFor.push( this.indices[Library.INDEX_DIR].buildIndex() );
-		this.indices[Library.INDEX_ARTIST] = new ArtistIndex(this.storage);
-		waitFor.push( this.indices[Library.INDEX_ARTIST].buildIndex() );
-		return Promise.all(waitFor);
-	}
-
-	reload() {
-		debug("reloading lib");
-		this.waitForPlaylists = this.loadPlaylists();
-		this.waitForIndices = this.loadIndices();
-
-		return Promise.all([this.waitForPlaylists, this.waitForIndices]);
-	}
-
-	createPlaylist(name) {
-		const _this = this;
-		let pl = new Playlist();
-		pl.name = name;
-		pl.createdAt = new Date();
-		pl.updatedAt = new Date();
-		return this.playlistStorage.save(pl)
-		.then((pl) => {
-			_this.playlists.set(pl._id,pl);
-			return pl;
-		})
+	waitForInit() {
+		if (!this.initPromise) {
+			this.initPromise = this.getStorage().init();
+		}
+		return this.initPromise;
 	}
 
 	scan(path) {
@@ -71,7 +33,7 @@ class Library {
 			update: false,
 			allowedEndings: Config.get('library.allowedFileExtensions')
 		});
-		let store = this.storage.getWriteStream();
+		let store = this.getStorage().getFileWriteStream();
 		return this.emitProgress(walker,meta,store,'scan',path);
 	}
 
@@ -79,7 +41,7 @@ class Library {
 		if (this.scanning) return false;
 		debug("updating lib at "+path);
 		this.scanning = true;
-		let entries = this.storage.getReadStream({ file: { $regex: this.storage.getPathStartRegexp(path,true) } });
+		let entries = this.getStorage().getFileReadStream({ file: { $regex: this.storage.getPathStartRegexp(path,true) } });
 		let store = this.storage.getWriteStream();
 		let meta = new MetaScan({
 			update: true,
@@ -107,12 +69,11 @@ class Library {
 					path: path
 				});
 				if (e) {
-					this.reload();
 					let err = new Error("error during scan/update",34343,e);
 					Status.error(err);
 					reject(err);
 				} else {
-					this.reload()
+					this.getStorage().reloadIndices()
 					.then(resolve,reject);
 				}
 			};
@@ -125,37 +86,42 @@ class Library {
 		});
 	}
 
-	getIndex(type) {
-		return this.indices[type];
+	createPlaylist(name) {
+		const _this = this;
+		let pl = new Playlist();
+		pl.name = name;
+		pl.createdAt = new Date();
+		pl.updatedAt = new Date();
+		return this.storage.savePlaylist(pl)
+		.then(() => {
+			return pl;
+		});
 	}
 
 	getPlaylist(id) {
-		return this.playlists.get(id);
+		return this.storage.loadPlaylist(id);
 	}
 
 	getPlaylistOverview() {
-		let res = [];
-		this.playlists.forEach((pl) => {
-			res.push(pl.getMeta());
+		return this.storage.getPlaylists()
+		.then((lists) => {
+			return lists.map(pl => pl.getMeta());
 		});
-		return res;
 	}
 
 	savePlaylist(pl) {
-		return this.playlistStorage.save(pl);
+		return this.storage.savePlaylist(pl);
 	}
 
 	deletePlaylist(pl) {
-		return this.playlistStorage.delete(pl)
-		.then((res) => {
-			this.playlists.delete(pl._id);
-			return res;
-		});
+		return this.storage.deletePlaylist(pl);
+	}
+
+	getStorage() {
+		return this.storage;
 	}
 
 }
 
-Library.INDEX_DIR = 'directory';
-Library.INDEX_ARTIST = 'artist';
 
 module.exports = Library;

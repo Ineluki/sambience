@@ -12,14 +12,18 @@ methods['GET /create'] = (params) => {
 methods['GET /create'].params = ['name'];
 
 methods['GET /additems'] = (params) => {
-	let pl = Lib.getPlaylist(params.id);
-	if (!pl) return Promise.reject(new Error("unknown playlist"));
-	let index = Lib.getIndex(params.type);
-	return index.handleInput(params.value)
+	let playlist;
+	return Lib.getPlaylist(params.id)
+	.then((pl) => {
+		playlist = pl;
+		return Lib.getStorage().getFilesByIndex(params.type,params.value);
+	})
 	.then((items) => {
-		pl.addMultiple(items);
-		return Lib.savePlaylist(pl)
-		.then(() => { return pl; });
+		playlist.addMultiple(items);
+		return Lib.savePlaylist(playlist);
+	})
+	.then(() => {
+		return playlist;
 	});
 };
 methods['GET /additems'].params = ['id','type','value'];
@@ -36,58 +40,70 @@ methods['GET /get'] = (params) => {
 methods['GET /get'].params = ['id'];
 
 methods['GET /moveitem'] = (params) => {
-	let pl = Lib.getPlaylist(params.id);
-	pl.orderSong(params.group, params.oldpos, params.group, params.newpos);
-	return Lib.savePlaylist(pl)
-	.then(() => { return pl; });
+	return Lib.getPlaylist(params.id)
+	.then((pl) => {
+		pl.orderSong(params.group, params.oldpos, params.group, params.newpos);
+		return Lib.savePlaylist(pl)
+		.then(() => { return pl; });
+	});
 };
 methods['GET /moveitem'].params = ['id','oldpos','newpos','group'];
 
 methods['GET /movegroup'] = (params) => {
-	let pl = Lib.getPlaylist(params.id);
-	pl.orderGroup(params.group, params.oldpos, params.newpos);
-	return Lib.savePlaylist(pl)
-	.then(() => { return pl; });
+	return Lib.getPlaylist(params.id)
+	.then((pl) => {
+		pl.orderGroup(params.oldpos, params.newpos);
+		return Lib.savePlaylist(pl)
+		.then(() => { return pl; });
+	});
 };
 methods['GET /movegroup'].params = ['id','oldpos','newpos'];
 
 methods['GET /sort'] = (params) => {
-	let pl = Lib.getPlaylist(params.id);
-	pl.sort();
-	return Lib.savePlaylist(pl)
-	.then(() => { return pl; });
+	return Lib.getPlaylist(params.id)
+	.then((pl) => {
+		pl.sort();
+		return Lib.savePlaylist(pl)
+		.then(() => { return pl; });
+	});
 };
 methods['GET /sort'].params = ['id'];
 
 methods['GET /removegroup'] = (params) => {
-	let pl = Lib.getPlaylist(params.id);
-	pl.removeGroup(params.pos);
-	return Lib.savePlaylist(pl)
-	.then(() => { return pl; });
+	return Lib.getPlaylist(params.id)
+	.then((pl) => {
+		pl.removeGroup(params.pos);
+		return Lib.savePlaylist(pl)
+		.then(() => { return pl; });
+	});
 };
 methods['GET /removegroup'].params = ['id','pos'];
 
 methods['GET /removesong'] = (params) => {
-	let pl = Lib.getPlaylist(params.id);
-	pl.removeSong(params.grp,params.song);
-	return Lib.savePlaylist(pl)
-	.then(() => { return pl; });
+	return Lib.getPlaylist(params.id)
+	.then((pl) => {
+		pl.removeSong(params.grp,params.song);
+		return Lib.savePlaylist(pl)
+		.then(() => { return pl; });
+	});
 };
 methods['GET /removesong'].params = ['id','grp','song'];
 
 
 methods['GET /save'] = (params) => {
 	let meta = params.obj;
-	let pl = Lib.getPlaylist(meta._id);
-	if (meta.delete) {
-		return Lib.deletePlaylist(pl);
-	} else {
-		pl.name = meta.name;
-		return Lib.savePlaylist(pl)
-		.then(() => {
-			return pl.getMeta();
-		});
-	}
+	return Lib.getPlaylist(meta._id)
+	.then((pl) => {
+		if (meta.delete) {
+			return Lib.deletePlaylist(pl);
+		} else {
+			pl.name = meta.name;
+			return Lib.savePlaylist(pl)
+			.then(() => {
+				return pl.getMeta();
+			});
+		}
+	});
 };
 methods['GET /save'].params = ['obj'];
 

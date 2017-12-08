@@ -8,6 +8,9 @@ Design
 Features
 --------
 
+ - after tab was in background (loop not running for some time) request updated status from server
+ - refactor to prep for mongodb
+ - save settings (like playlist mode) in db, not browser
 
 Bugs
 ----

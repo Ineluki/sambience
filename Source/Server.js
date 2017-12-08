@@ -6,6 +6,7 @@ const URL = require('url');
 const path = require("path");
 const FS = require('fs');
 const debug = require('debug')('sambience');
+const Lib = require("./Library/Main.js");
 const listenPort = require('../Source/Util/Config.js').get('core.port',8080);
 const app = new Koa();
 
@@ -31,10 +32,13 @@ FS.readdirSync(path.normalize(__dirname+'/Controller/')).forEach((entry) => {
 	app.use(r.middleware());
 });
 
+Lib.waitForInit()
+.then(() => {
+	app.listen(listenPort,() => {
+		debug(`listening on port ${listenPort}`);
+	});
+})
 
 
-app.listen(listenPort,() => {
-	debug(`listening on port ${listenPort}`);
-});
 
 module.exports = app;

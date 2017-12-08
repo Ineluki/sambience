@@ -1,6 +1,6 @@
 const Nedb = require('nedb');
-const Playlist = require('../Model/Playlist.js');
-const Error = require('../Util/Error.js');
+const Playlist = require('../../Model/Playlist.js');
+const Error = require('../../Util/Error.js');
 const debug = require('debug')('sambience');
 
 class PlaylistStorage {
@@ -17,10 +17,24 @@ class PlaylistStorage {
 		this.keys = Playlist.META_KEYS;
 	}
 
+	getById(id) {
+		return new Promise((resolve, reject) => {
+			this.db.findOne({ _id: id },(err,data) => {
+				if (err) return reject(err);
+				let pl = new Playlist();
+				this.keys.forEach(key => {
+					pl[key] = data[key];
+				})
+				pl.rawItems = data.items;
+				resolve(pl);
+			});
+		});
+	}
+
 	getLists() {
-		const playlists = [];
 		return new Promise((resolve, reject) => {
 			this.db.find({},(err,docs) => {
+				const playlists = [];
 				if (err) return reject(err);
 				let waitFor = [];
 				docs.forEach((data) => {
@@ -28,18 +42,19 @@ class PlaylistStorage {
 					this.keys.forEach(key => {
 						pl[key] = data[key];
 					})
+					pl.rawItems = data.items;
 					playlists.push( pl );
-					waitFor.push( this.metaStorage.getByIds(data.items) );
 				});
-				resolve( Promise.all(waitFor) );
+				resolve( playlists );
 			});
-		}).then((buckets) => {
-			buckets.forEach((items,i) => {
-				let pl = playlists[i];
-				items.forEach((item) => { pl.addFile(item); });
-			});
-			return playlists;
 		});
+		// .then((buckets) => {
+		// 	buckets.forEach((items,i) => {
+		// 		let pl = playlists[i];
+		// 		items.forEach((item) => { pl.addFile(item); });
+		// 	});
+		// 	return playlists;
+		// });
 	}
 
 	save(pl) {

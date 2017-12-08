@@ -23,13 +23,18 @@ methods['GET /setmode'].params = ['mode'];
 
 
 methods['GET /setposition'] = function(params) {
+	let p;
 	if (!Control.getPlaylist() || Control.getPlaylist().getId() !== params.playlist) {
-		let pl = Lib.getPlaylist(params.playlist);
-		if (!pl) return Promise.reject(new Error("unknown playlist: "+params.playlist));
-		Control.setPlaylist(pl);
+		p = Lib.getStorage().loadPlaylist(params.playlist);
+		p = p.then((pl) => {
+			Control.setPlaylist(pl);
+		});
+	} else {
+		p = Promise.resolve();
 	}
-	Control.setPosition(params.group, params.song);
-	return Promise.resolve();
+	return p.then(() => {
+		Control.setPosition(params.group, params.song);
+	});
 };
 methods['GET /setposition'].params = ['playlist','group','song'];
 
