@@ -3,7 +3,7 @@
 class AbstractAdapter {
 
 	reloadIndices() {
-		
+
 	}
 
 	getPlaylists() {
@@ -50,6 +50,17 @@ class AbstractAdapter {
 
 	}
 
+	getFilesByIndex(type,input) {
+
+	}
+
+	getSetting(key) {
+
+	}
+
+	setSetting(key,val) {
+		
+	}
 }
 
 module.exports = AbstractAdapter;

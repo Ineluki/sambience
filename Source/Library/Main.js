@@ -20,7 +20,14 @@ lib.waitForInit()
 		return p;
 	}
 }).then(() => {
+	return lib.getStorage().getSetting("playmode",Control.MODE_NORMAL)
+	.then(mode => {
+		Control.setMode(mode);
+	})
+}).then(() => {
 	debug("lib init complete");
+},(err) => {
+	debug("error init lib",err);
 });
 
 // lib.reload();

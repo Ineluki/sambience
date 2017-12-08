@@ -143,6 +143,8 @@ methods.getPlaylist = function() {
 methods.setMode = function(m) {
 	mode = m;
 };
+methods.getMode = function() { return mode; };
+
 methods.MODE_NORMAL = 0;
 methods.MODE_RANDOM_SONG = 1;
 methods.MODE_RANDOM_GROUP = 2;

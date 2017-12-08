@@ -1,8 +1,9 @@
 const AbstractAdapter = require('../AbstractAdapter.js');
 const ArtistIndex = require('./Index/Artist.js');
 const DirectoryIndex = require('./Index/Directory.js');
-const MetaStorage = require('./Storage.js');
+const MetaStorage = require('./MetaStorage.js');
 const PlaylistStorage = require('./PlaylistStorage.js');
+const SettingStorage = require('./SettingStorage.js');
 const debug = require('debug')('sambience');
 const Playlist = require("../../Model/Playlist.js");
 
@@ -12,6 +13,7 @@ class NedbAdapter extends AbstractAdapter {
 		super();
 		this.storage = new MetaStorage( config.music );
 		this.playlistStorage = new PlaylistStorage( config.playlist, this.storage );
+		this.settingStorage = new SettingStorage( config.settings );
 		this.indices = {
 			directory: null,
 			artist: null
@@ -116,6 +118,18 @@ class NedbAdapter extends AbstractAdapter {
 			index = this.indices.artist;
 		}
 		return index.handleInput(input);
+	}
+
+	getSetting(key,def) {
+		return this.settingStorage.get(key)
+		.catch((err) => {
+			if (err) console.error(err);
+			return def;
+		});
+	}
+
+	setSetting(key,val) {
+		return this.settingStorage.set(key,val);
 	}
 
 }

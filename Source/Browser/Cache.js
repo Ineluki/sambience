@@ -12,6 +12,6 @@ const createMethod = function(key) {
 	}
 };
 
-['playlistMode','currentPlaylist'].forEach(key => { createMethod(key); });
+['currentPlaylist'].forEach(key => { createMethod(key); });
 
 module.exports = methods;

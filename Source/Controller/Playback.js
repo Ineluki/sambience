@@ -17,9 +17,13 @@ methods['GET /'].params = ['cmd'];
 
 methods['GET /setmode'] = function(params) {
 	Control.setMode(~~(params.mode));
-	return Promise.resolve();
+	return Lib.getStorage().setSetting('playmode',~~(params.mode));
 };
 methods['GET /setmode'].params = ['mode'];
+
+methods['GET /getmode'] = function() {
+	return Promise.resolve( Control.getMode() );
+};
 
 
 methods['GET /setposition'] = function(params) {
