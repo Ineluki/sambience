@@ -1,4 +1,5 @@
 const TreeNode = require('./TreeNode.js');
+const debug = require('debug')('sambience');
 
 class Playlist {
 
@@ -55,6 +56,7 @@ class Playlist {
 		let groupKey = group._key;
 		if (!this.groupMap.has(groupKey)) {
 			let grpNode = this.root.addChild(group);
+			debug("added grp",groupKey,this.root.size);
 			this.groupMap.set(groupKey,grpNode);
 		}
 		let grpNode = this.groupMap.get(groupKey);
@@ -183,9 +185,10 @@ class Playlist {
 	removeGroup(gpos) {
 		let node = this.root.getChild(gpos);
 		if (this.currentPosition && this.currentPosition.parent === node) {
-			this.currentPosition = node.next ? node.getNext().firstChild : null;
+			this.currentPosition = node.next ? node.next.firstChild : null;
 		}
 		let grpKey = node.content._key;
+		debug("remove group",gpos,grpKey);
 		this.groupMap.delete(grpKey);
 		this.root.removeChild(node);
 	}

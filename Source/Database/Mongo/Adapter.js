@@ -71,8 +71,15 @@ class MongoAdapter extends AbstractAdapter {
 			Playlist.META_KEYS.forEach(key => {
 				pl[key] = data[key];
 			});
+			let idx = {};
+			data.items.forEach((i,n) => {
+				idx[""+i] = n;
+			});
 			return this.songs.find({ _id: { $in: data.items } })
 			.then(songs => {
+				songs.sort((a,b) => {
+					return idx[""+a._id] > idx[""+b._id] ? 1 : -1;
+				});
 				songs.forEach(song => pl.addFile(song));
 				return pl;
 			});
@@ -93,6 +100,7 @@ class MongoAdapter extends AbstractAdapter {
 			}
 		});
 		data.updatedAt = new Date();
+		debug("saving playlist",data);
 		let res;
 		if (pl._id) {
 			res = this.playlists.update({ _id: pl._id }, data, { upsert: true, multi: false, returnUpdatedDocs: true });
