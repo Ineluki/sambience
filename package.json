@@ -29,6 +29,7 @@
     "koa-session": "^5.5.0",
     "koa-static": "^4.0.1",
     "lodash.debounce": "^4.0.8",
+    "monk": "^6.0.5",
     "musicmetadata": "^2.0.5",
     "nedb": "^1.8.0",
     "pump": "^1.0.2",

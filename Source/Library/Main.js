@@ -24,7 +24,16 @@ lib.waitForInit()
 	.then(mode => {
 		Control.setMode(mode);
 	})
-}).then(() => {
+})
+.then(() => {
+	return lib.getPlaylistOverview()
+	.then(res => {
+		if (res.length === 0) {
+			return lib.createPlaylist("New Playlsit");
+		}
+	});
+})
+.then(() => {
 	debug("lib init complete");
 },(err) => {
 	debug("error init lib",err);

@@ -90,8 +90,6 @@ class Library {
 		const _this = this;
 		let pl = new Playlist();
 		pl.name = name;
-		pl.createdAt = new Date();
-		pl.updatedAt = new Date();
 		return this.storage.savePlaylist(pl)
 		.then(() => {
 			return pl;

@@ -10,6 +10,10 @@ class AbstractAdapter {
 
 	}
 
+	loadPlaylist(id) {
+
+	}
+
 	savePlaylist(pl) {
 
 	}
@@ -59,7 +63,7 @@ class AbstractAdapter {
 	}
 
 	setSetting(key,val) {
-		
+
 	}
 }
 
