@@ -1,39 +1,42 @@
 import Vue from 'vue';
-const axios = require('axios');
 const Error = require('../Util/Error.js');
-
-var sse;
+const RRM = require('../Util/rrm.js');
+const ReconnectingWebSocket = require('reconnecting-websocket');
 const bus = new Vue();
 
+let websocket = new ReconnectingWebSocket('ws://'+document.location.host+'/ws/');
+let hostConnection = new RRM({
+	out: (data) => {
+		websocket.send(JSON.stringify(data));
+	},
+	initStatus: RRM.S_QUEUED
+});
+websocket.addEventListener('message',(e) => {
+	hostConnection.handleRequest(JSON.parse(e.data));
+});
+websocket.addEventListener('open',() => {
+	hostConnection.setStatus(RRM.S_OPEN);
+});
+websocket.addEventListener('close',() => {
+	hostConnection.setStatus(RRM.S_QUEUED);
+});
+
+
+
 let bindEvents = ['playback','scan','error'];
-function initSse() {
-	sse = new EventSource('/sse/');
+function initConnection() {
 	bindEvents.forEach(event => {
-		sse.addEventListener(event,function(e) {
-			let data = JSON.parse(e.data);
+		hostConnection.setHandler(event,function(data) {
 			bus.$emit(event,data);
 		});
 	});
-	sse.onerror = function(e) {
-		console.error("see-error",e);
-	};
 }
 
-initSse();
+initConnection();
 
 const request = function(action,params) {
-	return axios({
-		method: 'GET',
-		url: action + (params ? `?__p=${encodeURIComponent( JSON.stringify(params) )}` : '')
-	}).then(result => {
-		if (result.data.error) {
-			let e = Error.fromJSON(result.data);
-			bus.$emit('error',e);
-			return Promise.reject(e);
-		}
-		return result.data;
-	});
-}
+	return hostConnection.createRequest(action,params,1000);
+};
 
 module.exports = {
 	request,

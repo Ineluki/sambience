@@ -72,7 +72,7 @@ export default {
 	methods: {
 		control: function(cmd) {
 			// console.log("control",cmd);
-			request('/playback',{
+			request('/playback/',{
 				cmd: cmd
 			});
 		},

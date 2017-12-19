@@ -2,35 +2,26 @@ const ExtendableError = require('./Error.js');
 const debug = require('debug')('sambience');
 const methods = {};
 
-methods.expectArguments = function(request,args) {
-	let res = {};
-	let data;
-	try {
-		data = request.query.__p ? JSON.parse(request.query.__p) : {};
-	} catch (e) {
-		throw new ExtendableError("invalid json",1506955035,{ json: request.query.__p });
-	}
+methods.expectArguments = function(data,args) {
 	args.forEach((arg) => {
-		if (!(arg in request.query) && !(arg in data)) {
+		if (!(arg in data)) {
 			throw new ExtendableError("missing argument",1506554035,arg);
 		}
-		res[arg] = arg in data ? data[arg] : request.query[arg];
 	});
-	return res;
+	return data;
 };
 
 methods.wrap = function(args,fn) {
-	return async(ctx,next) => {
+	return async(params) => {
 		try {
-			params = methods.expectArguments(ctx.request,args);
+			params = methods.expectArguments(params,args);
 		} catch (e) {
-			ctx.body = JSON.stringify(e,null,' ');
-			return;
+			return e;
 		}
-		await Promise.resolve(params)
+		return Promise.resolve(params)
 		.then(fn)
 		.then((res) => {
-			ctx.body = JSON.stringify(res,null,' ');
+			return res;
 		},(err) => {
 			debug("request error",err);
 			let data;
@@ -44,14 +35,14 @@ methods.wrap = function(args,fn) {
 			} else {
 				data = err;
 			}
-			ctx.body = JSON.stringify(data,null,' ');
+			return Promise.reject(data);
 		});
 	}
 };
 
 methods.fillRouter = function(router,list) {
 	for(let r in list) {
-		router.addRoute(r,methods.wrap( list[r].params ? list[r].params : [], list[r] ));
+		router[r] = methods.wrap( list[r].params ? list[r].params : [], list[r] );
 	}
 };
 

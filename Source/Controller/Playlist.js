@@ -3,15 +3,15 @@ const Lib = require('../Library/Main.js');
 
 const methods = {};
 
-methods['GET /create'] = (params) => {
+methods['/create'] = (params) => {
 	return Lib.createPlaylist(params.name)
 	.then((pl) => {
 		return pl.getMeta();
 	});
 };
-methods['GET /create'].params = ['name'];
+methods['/create'].params = ['name'];
 
-methods['GET /additems'] = (params) => {
+methods['/additems'] = (params) => {
 	let playlist;
 	return Lib.getPlaylist(params.id)
 	.then((pl) => {
@@ -26,20 +26,20 @@ methods['GET /additems'] = (params) => {
 		return playlist;
 	});
 };
-methods['GET /additems'].params = ['id','type','value'];
+methods['/additems'].params = ['id','type','value'];
 
-methods['GET /'] = (params) => {
+methods['/'] = (params) => {
 	return Lib.getPlaylistOverview();
 };
-methods['GET /'].params = [];
+methods['/'].params = [];
 
 
-methods['GET /get'] = (params) => {
+methods['/get'] = (params) => {
 	return Lib.getPlaylist(params.id);
 };
-methods['GET /get'].params = ['id'];
+methods['/get'].params = ['id'];
 
-methods['GET /moveitem'] = (params) => {
+methods['/moveitem'] = (params) => {
 	return Lib.getPlaylist(params.id)
 	.then((pl) => {
 		pl.orderSong(params.group, params.oldpos, params.group, params.newpos);
@@ -47,9 +47,9 @@ methods['GET /moveitem'] = (params) => {
 		.then(() => { return pl; });
 	});
 };
-methods['GET /moveitem'].params = ['id','oldpos','newpos','group'];
+methods['/moveitem'].params = ['id','oldpos','newpos','group'];
 
-methods['GET /movegroup'] = (params) => {
+methods['/movegroup'] = (params) => {
 	return Lib.getPlaylist(params.id)
 	.then((pl) => {
 		pl.orderGroup(params.oldpos, params.newpos);
@@ -57,9 +57,9 @@ methods['GET /movegroup'] = (params) => {
 		.then(() => { return pl; });
 	});
 };
-methods['GET /movegroup'].params = ['id','oldpos','newpos'];
+methods['/movegroup'].params = ['id','oldpos','newpos'];
 
-methods['GET /sort'] = (params) => {
+methods['/sort'] = (params) => {
 	return Lib.getPlaylist(params.id)
 	.then((pl) => {
 		pl.sort();
@@ -67,9 +67,9 @@ methods['GET /sort'] = (params) => {
 		.then(() => { return pl; });
 	});
 };
-methods['GET /sort'].params = ['id'];
+methods['/sort'].params = ['id'];
 
-methods['GET /removegroup'] = (params) => {
+methods['/removegroup'] = (params) => {
 	return Lib.getPlaylist(params.id)
 	.then((pl) => {
 		pl.removeGroup(params.pos);
@@ -77,9 +77,9 @@ methods['GET /removegroup'] = (params) => {
 		.then(() => { return pl; });
 	});
 };
-methods['GET /removegroup'].params = ['id','pos'];
+methods['/removegroup'].params = ['id','pos'];
 
-methods['GET /removesong'] = (params) => {
+methods['/removesong'] = (params) => {
 	return Lib.getPlaylist(params.id)
 	.then((pl) => {
 		pl.removeSong(params.grp,params.song);
@@ -87,10 +87,10 @@ methods['GET /removesong'] = (params) => {
 		.then(() => { return pl; });
 	});
 };
-methods['GET /removesong'].params = ['id','grp','song'];
+methods['/removesong'].params = ['id','grp','song'];
 
 
-methods['GET /save'] = (params) => {
+methods['/save'] = (params) => {
 	let meta = params.obj;
 	return Lib.getPlaylist(meta._id)
 	.then((pl) => {
@@ -105,7 +105,7 @@ methods['GET /save'] = (params) => {
 		}
 	});
 };
-methods['GET /save'].params = ['obj'];
+methods['/save'].params = ['obj'];
 
 module.exports = function(router) {
 	ReqRes.fillRouter(router,methods);

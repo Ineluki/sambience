@@ -3,20 +3,20 @@ const Lib = require('../Library/Main.js');
 
 const methods = {};
 
-methods['GET /index'] = function(params) {
+methods['/index'] = function(params) {
 	return Lib.getStorage().getIndexView(params.type,params.sub);
 };
-methods['GET /index'].params = ['type','sub'];
+methods['/index'].params = ['type','sub'];
 
 
-methods['GET /index/filter'] = function(params) {
+methods['/index/filter'] = function(params) {
 	let data = Lib.getStorage().getIndexSearch(params.type,params.search);
 	return data;
 };
-methods['GET /index/filter'].params = ['search','type'];
+methods['/index/filter'].params = ['search','type'];
 
 
-methods['GET /index/scan'] = function(params) {
+methods['/index/scan'] = function(params) {
 	let p = params.path;
 	if (p.map) {
 		p = '/'+p.join('/');
@@ -27,7 +27,7 @@ methods['GET /index/scan'] = function(params) {
 		return Lib.updateLib(p);
 	}
 };
-methods['GET /index/scan'].params = ['path','type'];
+methods['/index/scan'].params = ['path','type'];
 
 
 module.exports = function(router) {

@@ -62,6 +62,9 @@ function moveQueueForward() {
 }
 
 function playNext() {
+	if (!playlist) {
+		return Promise.reject(new Error("no playlist set"));
+	}
 	let meta = playlist.getCurrentSong();
 	if (!meta) {
 		return Promise.reject(new Error("no current song to play"));

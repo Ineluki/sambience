@@ -5,28 +5,28 @@ const Lib = require('../Library/Main.js');
 
 const methods = {};
 
-methods['GET /'] = function(params) {
+methods['/'] = function(params) {
 	if (!Control[params.cmd]) {
 		return Promise.reject(new Error("unknown command: "+params.cmd));
 	}
 	return Promise.resolve(Control[params.cmd]());
 
 };
-methods['GET /'].params = ['cmd'];
+methods['/'].params = ['cmd'];
 
 
-methods['GET /setmode'] = function(params) {
+methods['/setmode'] = function(params) {
 	Control.setMode(~~(params.mode));
 	return Lib.getStorage().setSetting('playmode',~~(params.mode));
 };
-methods['GET /setmode'].params = ['mode'];
+methods['/setmode'].params = ['mode'];
 
-methods['GET /getmode'] = function() {
+methods['/getmode'] = function() {
 	return Promise.resolve( Control.getMode() );
 };
 
 
-methods['GET /setposition'] = function(params) {
+methods['/setposition'] = function(params) {
 	let p;
 	if (!Control.getPlaylist() || Control.getPlaylist().getId() !== params.playlist) {
 		p = Lib.getStorage().loadPlaylist(params.playlist);
@@ -40,7 +40,7 @@ methods['GET /setposition'] = function(params) {
 		Control.setPosition(params.group, params.song);
 	});
 };
-methods['GET /setposition'].params = ['playlist','group','song'];
+methods['/setposition'].params = ['playlist','group','song'];
 
 
 module.exports = function(router) {
