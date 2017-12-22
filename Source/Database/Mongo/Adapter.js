@@ -244,6 +244,11 @@ class MongoAdapter extends AbstractAdapter {
 				leafs: { $sum: 1 }
 			}
 		};
+		let sort = {
+			$sort: {
+				_id: 1
+			}
+		};
 		let project2 = {
 			$project: {
 				_id: false,
@@ -261,7 +266,7 @@ class MongoAdapter extends AbstractAdapter {
 				} }
 			}
 		};
-		return this.songs.aggregate([filter,project,group,project2,group2])
+		return this.songs.aggregate([filter,project,group,project2,group2,sort])
 		.then(res => {
 			return res.map(row => {
 				let path = pathArr.slice(0);

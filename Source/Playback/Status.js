@@ -23,10 +23,11 @@ setInterval(() => {
 
 module.exports = {
 	subscribe: function(socket) {
-		return sse.subscribe( socket );
+		let unsub = sse.subscribe( socket );
 		if (latestStatus) {
 			this.playback(latestStatus);
 		}
+		return unsub;
 	},
 
 	playback: function(data) {

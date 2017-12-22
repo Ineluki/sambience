@@ -1,6 +1,6 @@
 {
   "name": "Sambience",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "a music server",
   "main": "Source/Server.js",
   "scripts": {
@@ -19,7 +19,6 @@
   "author": "Stormking <sturmspitze@googlemail.com>",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.16.2",
     "bootstrap": "^3.3.7",
     "conf": "^1.2.0",
     "debug": "^3.0.1",
@@ -35,7 +34,6 @@
     "nedb": "^1.8.0",
     "pump": "^1.0.2",
     "reconnecting-websocket": "^3.2.2",
-    "sse-broadcast": "^0.4.1",
     "vue": "^2.0.1",
     "vue-context-menu": "^2.0.6",
     "vuedraggable": "^2.14.1"
