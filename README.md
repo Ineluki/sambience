@@ -91,3 +91,11 @@ Prefix `DEBUG=sambience*` to any command (scanning, starting) to see the debug l
  * library.baseDirs - list of paths scanned during first start (when index is empty after loading)
  * playback.player - player executable (mplayer/aplay/gst123)
  * core.port - network port to listen to for web-ui
+
+ Changelog
+ ---------
+
+ ### v1.1
+
+  * mongodb support added
+  * switched from SSE to websockets
