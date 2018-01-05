@@ -1,5 +1,18 @@
 const ReqRes = require('../Util/Reqres.js');
+const Control = require('../Playback/Control.js');
 const Lib = require('../Library/Main.js');
+
+function updateRunning(pl) {
+	let opl = Control.getPlaylist();
+	console.log("update running",opl.getId(), pl.getId());
+	if (opl && ""+opl.getId() === ""+pl.getId()) {
+		console.log("setting updated playlist");
+		Control.setPlaylist(pl);
+		let pos = opl.getNumericPosition();
+		console.log("setting updated position",pos);
+		pl.moveToPosition(pos[0],pos[1]);
+	}
+}
 
 const methods = {};
 
@@ -23,6 +36,7 @@ methods['/additems'] = (params) => {
 		return Lib.savePlaylist(playlist);
 	})
 	.then(() => {
+		updateRunning(playlist);
 		return playlist;
 	});
 };
@@ -44,7 +58,10 @@ methods['/moveitem'] = (params) => {
 	.then((pl) => {
 		pl.orderSong(params.group, params.oldpos, params.group, params.newpos);
 		return Lib.savePlaylist(pl)
-		.then(() => { return pl; });
+		.then(() => {
+			updateRunning(pl);
+			return pl;
+		});
 	});
 };
 methods['/moveitem'].params = ['id','oldpos','newpos','group'];
@@ -54,7 +71,10 @@ methods['/movegroup'] = (params) => {
 	.then((pl) => {
 		pl.orderGroup(params.oldpos, params.newpos);
 		return Lib.savePlaylist(pl)
-		.then(() => { return pl; });
+		.then(() => {
+			updateRunning(pl);
+			return pl;
+		});
 	});
 };
 methods['/movegroup'].params = ['id','oldpos','newpos'];
@@ -64,7 +84,10 @@ methods['/sort'] = (params) => {
 	.then((pl) => {
 		pl.sort();
 		return Lib.savePlaylist(pl)
-		.then(() => { return pl; });
+		.then(() => {
+			updateRunning(pl);
+			return pl;
+		});
 	});
 };
 methods['/sort'].params = ['id'];
@@ -74,7 +97,10 @@ methods['/removegroup'] = (params) => {
 	.then((pl) => {
 		pl.removeGroup(params.pos);
 		return Lib.savePlaylist(pl)
-		.then(() => { return pl; });
+		.then(() => {
+			updateRunning(pl);
+			return pl;
+		});
 	});
 };
 methods['/removegroup'].params = ['id','pos'];
@@ -84,7 +110,10 @@ methods['/removesong'] = (params) => {
 	.then((pl) => {
 		pl.removeSong(params.grp,params.song);
 		return Lib.savePlaylist(pl)
-		.then(() => { return pl; });
+		.then(() => {
+			updateRunning(pl);
+			return pl;
+		});
 	});
 };
 methods['/removesong'].params = ['id','grp','song'];
@@ -105,6 +134,7 @@ methods['/save'] = (params) => {
 			pl.name = meta.name;
 			return Lib.savePlaylist(pl)
 			.then(() => {
+				updateRunning(pl);
 				return pl.getMeta();
 			});
 		}

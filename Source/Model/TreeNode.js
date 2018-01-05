@@ -105,6 +105,19 @@ class TreeNode {
 		return null;
 	}
 
+	getNodePos(obj) {
+		let n = this.firstChild;
+		let compareWrap = (obj instanceof TreeNode);
+		let pos = 0;
+		do {
+			if (compareWrap && obj === n || n.content === obj) {
+				return pos;
+			}
+			pos += 1;
+		} while(n = n.next);
+		return null;
+	}
+
 	getNext() {
 		if (this.next) {
 			return this.next;

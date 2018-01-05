@@ -216,6 +216,14 @@ class Playlist {
 		return d;
 	}
 
+	getNumericPosition() {
+		if (!this.currentPosition) return null;
+		let p = this.currentPosition.parent;
+		let spos = p.getNodePos(this.currentPosition);
+		let gpos = this.root.getNodePos(p);
+		return [gpos,spos];
+	}
+
 }
 
 Playlist.META_KEYS = ['_id','createdAt','updatedAt','name'];
