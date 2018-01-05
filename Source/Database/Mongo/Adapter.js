@@ -110,8 +110,9 @@ class MongoAdapter extends AbstractAdapter {
 			res = this.playlists.insert(data);
 		}
 		return res.then(data => {
+			debug("after pl save",data);
 			Playlist.META_KEYS.forEach(key => {
-				pl[key] = data[key];
+				if (data[key]) pl[key] = data[key];
 			});
 			return pl;
 		});

@@ -95,7 +95,12 @@ methods['/save'] = (params) => {
 	return Lib.getPlaylist(meta._id)
 	.then((pl) => {
 		if (meta.delete) {
-			return Lib.deletePlaylist(pl);
+			return Lib.deletePlaylist(pl)
+			.then(() => {
+				return {
+					deleted: pl._id
+				};
+			});
 		} else {
 			pl.name = meta.name;
 			return Lib.savePlaylist(pl)
