@@ -58,6 +58,9 @@ export default {
 				this.addLog(`${data.type} progress: ${data.progress}`,'info',false);
 			}
 		});
+		bus.$on('error',(data) => {
+			this.addLog(data,'error',true);
+		});
 		bus.$on('playback',(data) => {
 			if (data.type === 'started') {
 				this.status.began = data.began;
@@ -83,6 +86,14 @@ export default {
 			if (this.logLine && this.logLine.history) {
 				this.logHistory.unshift(this.logLine);
 			}
+			let d = new Date();
+			let h = ""+d.getHours();
+			let m = ""+d.getMinutes();
+			let s = ""+d.getSeconds();
+			if (h.length < 2) h = "0"+h;
+			if (m.length < 2) m = "0"+m;
+			if (s.length < 2) s = "0"+s;
+			msg = '['+h+':'+m+':'+s+'] '+msg;
 			this.logLine = {
 				msg: msg,
 				cls: cls,

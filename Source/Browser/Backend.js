@@ -9,7 +9,8 @@ let hostConnection = new RRM({
 	out: (data) => {
 		websocket.send(JSON.stringify(data));
 	},
-	initStatus: RRM.S_QUEUED
+	initStatus: RRM.S_QUEUED,
+	timeout: 9000
 });
 websocket.addEventListener('message',(e) => {
 	hostConnection.handleRequest(JSON.parse(e.data));
@@ -35,7 +36,11 @@ function initConnection() {
 initConnection();
 
 const request = function(action,params) {
-	return hostConnection.createRequest(action,params,1000);
+	return hostConnection.createRequest(action,params,1000)
+	.catch(err => {
+		bus.$emit('error',(err.message ? err.message : err) +" for action "+action);
+		return Promise.reject(err);
+	});
 };
 
 module.exports = {
