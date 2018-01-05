@@ -104,7 +104,13 @@ methods.stop = function() {
 
 methods.jumpNext = function() {
 	methods.stop();
-	if (playlist.moveToNextSong()) {
+	let moved;
+	if (mode === methods.MODE_RANDOM_SONG) {
+		moved = playlist.moveToRandomSong();
+	} else {
+		moved = playlist.moveToNextSong();
+	}
+	if (moved) {
 		methods.start();
 	}
 };
