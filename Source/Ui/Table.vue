@@ -21,7 +21,7 @@
 							v-for="(entry,entryIndex) in group.children"
 							@dblclick="play(grpIndex,entryIndex)">
 							<span class="glyphicon glyphicon-play"
-								v-bind:class="{ invisible: (active != entry._id) }"></span>
+								v-bind:class="{ invisible: (!activePlaylist || activeSong != entry._id) }"></span>
 							<span v-for="key in columns">
 								{{entry[key]}}
 							</span>
@@ -48,7 +48,8 @@ import {currentPlaylist} from '../Browser/Cache.js';
 export default {
 	name: 'grid',
 	props: {
-		active: String,
+		activeSong: String,
+		activePlaylist: Boolean,
 		columns: Array,
 		groupColumns: Array,
 		data: Array

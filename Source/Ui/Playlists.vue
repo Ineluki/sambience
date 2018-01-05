@@ -34,7 +34,8 @@
 			:columns="gridColumns"
 			:group-columns="groupColumns"
 			:data="playlistData"
-			:active="playing.song">
+			:activeSong="playing.song"
+			:activePlaylist="playing.playlist == currentList">
 		</grid>
 	</div>
 </template>
